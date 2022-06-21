@@ -1,0 +1,8 @@
+Remove files 
+
+FTP Commands:
+    - RETR, STRO, LIST
+    - send PORT N+1 
+
+# active FTP mode only (no passive)
+
