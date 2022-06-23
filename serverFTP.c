@@ -14,11 +14,15 @@
 #define PORT 9007
 #define MAXUSER 100
 
+int listSize = 0;
+
 struct User
 {
 	char* username;
 	char* password;
+	//char* path
 };
+
 
 void getAuth(struct User *userList)
 {
@@ -34,13 +38,17 @@ void getAuth(struct User *userList)
     }
 
 	//iterate through lines
-	int count = 0;
 	while ((lineSize = getline(&line, &len, file)) != -1) {
 
+		struct User tempUser; 
+
 		char** userArray = tokenizer(line);
-		userList->username = userArray[0];
-		userList->password = userArray[1];
-		count++;
+
+		tempUser.username = userArray[0];
+		tempUser.password = userArray[1];
+
+		userList[listSize] = tempUser;
+		listSize++;
     }
 }
 
@@ -62,9 +70,10 @@ int main()
 	// clear();
 	
 	//read user.txt file
-	struct User *userList[MAXUSER];
-	getAuth(&userList);
-	printf(userList[1]->password);
+	struct User userList[MAXUSER];
+	
+
+	// printf(userList[1]->password);
 
 	int server_socket = socket(AF_INET,SOCK_STREAM,0);
 	// printf("Server fd = %d \n",server_socket);
@@ -119,6 +128,12 @@ int main()
 	printf("\n ----------------| FTP Server |----------------");
 	printf("\n Waiting for Client to join!");
 
+	getAuth(userList);
+
+	for(int i = 0; i<listSize; i++)
+	{
+		printf("\n %s, %s \n", userList[i].password, userList[i].username);
+	}
 	while(1)
 	{		
 		//notice so far, we have created 2 fd_sets : all_sockets , ready_sockets

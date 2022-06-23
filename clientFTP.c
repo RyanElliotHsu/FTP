@@ -85,6 +85,38 @@ int main()
         }
         bzero(command,sizeof(command));			
 	}
+    
+    char **tokens = tokenizer(command);
+
+    printf("\n\n%s\n\n", tokens[0], tokens[1]);
+
+    if((strcmp(tokens[0],"USER")==0) || (strcmp(tokens[0],"PASS")==0))
+    {
+        send(network_socket,command,strlen(command),0);
+    }
+    else if((strcmp(tokens[0],"RETR")==0) || (strcmp(tokens[0],"STOR")==0) ||(strcmp(tokens[0],"LIST")==0) )
+    {
+        send(network_socket,command,strlen(command),0);
+    }
+    else if((strcmp(tokens[0],"CWD")==0) || (strcmp(tokens[0],"PWD")==0))
+    {
+        send(network_socket,command,strlen(command),0);
+    }
+    else if(strcmp(tokens[0],"QUIT")==0)
+    {
+        send(network_socket,command,strlen(command),0);
+    }
+    else
+    {
+        printf("Invalid Command! \n");
+    }
+    
+    // else if (!cwd) or (!pwd)
+    // {
+    //     exec...
+    // }
+    // else    
+    //     print invalid command
 
 	return 0;
 }
