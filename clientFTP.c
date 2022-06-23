@@ -27,8 +27,9 @@
 
 int main()
 {   
+    clear();
     char* command;
-    printf("\n ----------------| FTP Server |----------------");
+    printf("\n ----------------| FTP Client |----------------");
 	//create a socket
 	int network_socket;
 	network_socket = socket(AF_INET , SOCK_STREAM, 0);
@@ -69,7 +70,6 @@ int main()
     //     fgets(command,sizeof(command),command);
     //    command[strcspn(command, "\n")] = 0;  //remove trailing newline char from command, fgets does not remove it
       
-      
        if(strcmp(command,"exit")==0)
         {
             printf("closing the connection to server \n");
@@ -77,12 +77,12 @@ int main()
             break;
         }
         
+        // if ()
         if(send(network_socket,command,strlen(command),0)<0)
         {
             perror("send");
             exit(EXIT_FAILURE);
         }
-        
         bzero(command,sizeof(command));			
 	}
 

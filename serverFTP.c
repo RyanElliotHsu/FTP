@@ -38,7 +38,6 @@ void getAuth(struct User *userList)
 	while ((lineSize = getline(&line, &len, file)) != -1) {
 
 		char** userArray = tokenizer(line);
-		
 		userList->username = userArray[0];
 		userList->password = userArray[1];
 		count++;

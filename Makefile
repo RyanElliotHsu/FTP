@@ -1,12 +1,12 @@
-shell: parseinput.o FTPserver.o FTPclient.o
-	gcc parseinput.o FTPserver.o -o FTPserver
-	gcc parseinput.o FTPclient.o -o FTPclient
+shell: parseinput.o serverFTP.o clientFTP.o
+	gcc parseinput.o serverFTP.o -o serverFTP
+	gcc parseinput.o clientFTP.o -o clientFTP
 
-FTPserver.o: FTPserver.c 
-	gcc -c FTPserver.c
+serverFTP.o: serverFTP.c 
+	gcc -c serverFTP.c
 
-FTPclient.o: FTPclient.c 
-	gcc -c FTPclient.c
+clientFTP.o: clientFTP.c 
+	gcc -c clientFTP.c
 
 parseinput.o: parseinput.c parseinput.h
 	gcc -c parseinput.c

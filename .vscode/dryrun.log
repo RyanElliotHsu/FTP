@@ -1,9 +1,7 @@
 make --dry-run --keep-going --print-directory
 make: Entering directory `/Users/soumenmohanty/Documents/GitHub/Untitled'
-gcc -c FTPserver.c
+gcc parseinput.o serverFTP.o -o serverFTP
+gcc parseinput.o clientFTP.o -o clientFTP
  
-gcc -c FTPclient.c
-gcc parseinput.o FTPserver.o -o FTPserver
-gcc parseinput.o FTPclient.o -o FTPclient
 make: Leaving directory `/Users/soumenmohanty/Documents/GitHub/Untitled'
  
