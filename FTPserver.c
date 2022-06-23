@@ -12,6 +12,7 @@
 
 #define clear() printf("\033[H\033[J")
 #define PORT 9007
+#define MAXUSER 100
 
 struct User
 {
@@ -19,34 +20,34 @@ struct User
 	char* password;
 };
 
-void getAuth()
-{
-	FILE *file = fopen("user.txt", "r"); 
-    char *line = NULL; 
-    size_t len = 0; 
-    ssize_t lineSize;
+struct User userList[MAXUSER];
 
-	//error check for opening file
-	if (file == NULL) { 
-        perror("fopen"); 
-        exit(EXIT_FAILURE); 
-    }
+// void getAuth()
+// {
+// 	FILE *file = fopen("user.txt", "r"); 
+//     char *line = NULL; 
+//     size_t len = 0; 
+//     ssize_t lineSize;
 
-	//iterate through lines
-	while ((lineSize = getline(&line, &len, file)) != -1) {
+// 	//error check for opening file
+// 	if (file == NULL) { 
+//         perror("fopen"); 
+//         exit(EXIT_FAILURE); 
+//     }
 
-		char** userArray = tokenizer(line);
-		if 
-        printf("Retrieved line of length %zu:\n", nread); 
-        fwrite(line, nread, 1, stdout); 
-    }
-}
+// 	//iterate through lines
+// 	while ((lineSize = getline(&line, &len, file)) != -1) {
+
+// 		char** userArray = tokenizer(line);
+// 		if 
+// 	    printf("Retrieved line of length %zu:\n", nread); 
+//         fwrite(line, nread, 1, stdout); 
+//     }
+// }
 
 void userAuth(const char* username)
 {
 	
-
-
 }
 
 void passAuth(const char* password)
@@ -59,6 +60,8 @@ void passAuth(const char* password)
 //recv()
 int main()
 {
+	//read user.txt file
+
 	int server_socket = socket(AF_INET,SOCK_STREAM,0);
 	// printf("Server fd = %d \n",server_socket);
 	
