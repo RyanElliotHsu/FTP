@@ -1,8 +1,12 @@
 Remove files 
 
 FTP Commands:
-    - RETR, STRO, LIST
+    - RETR, 
+    - STOR, LIST
     - send PORT N+1 
+    - ! for client side commands
+    
+- restrict trasnfer mode to stream mode 
 
 # active FTP mode only (no passive)
 
