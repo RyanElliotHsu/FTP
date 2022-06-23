@@ -23,7 +23,6 @@ struct User
 	//char* path
 };
 
-
 void getAuth(struct User *userList)
 {
 	FILE *file = fopen("user.txt", "r"); 
@@ -44,10 +43,18 @@ void getAuth(struct User *userList)
 
 		char** userArray = tokenizer(line);
 
-		tempUser.username = userArray[0];
-		tempUser.password = userArray[1];
+		printf("\n#%s#%s#", userArray[0], userArray[1]);
 
-		userList[listSize] = tempUser;
+		userList[listSize].username = userArray[0];
+		userList[listSize].password = userArray[1];
+		
+		// tempUser.username = userArray[0];
+		// tempUser.password = userArray[1];
+
+		// printf("\n#%s#%s#", tempUser.username, tempUser.password);
+
+		// userList[listSize] = tempUser;
+		printf("$$$%s", userList[listSize].password);
 		listSize++;
     }
 }
@@ -66,15 +73,19 @@ void passAuth(const char* password)
 
 //recv()
 int main()
-{
-	// clear();
-	
+{	
+	printf("\n ----------------| FTP Server |----------------");
+	printf("\n Waiting for Client to join!");
+
 	//read user.txt file
 	struct User userList[MAXUSER];
+	getAuth(userList);
+	printf("\n%s\n",userList[1].password);
+	// for(int i = 0; i<listSize; i++)
+	// {
+	// 	printf("\n %s, %s \n", userList[i].password, userList[i].username);
+	// }
 	
-
-	// printf(userList[1]->password);
-
 	int server_socket = socket(AF_INET,SOCK_STREAM,0);
 	// printf("Server fd = %d \n",server_socket);
 	
@@ -124,16 +135,6 @@ int main()
 	//adds one socket (the current socket) to the fd set of all sockets
 	FD_SET(server_socket,&all_sockets);
 
-
-	printf("\n ----------------| FTP Server |----------------");
-	printf("\n Waiting for Client to join!");
-
-	getAuth(userList);
-
-	for(int i = 0; i<listSize; i++)
-	{
-		printf("\n %s, %s \n", userList[i].password, userList[i].username);
-	}
 	while(1)
 	{		
 		//notice so far, we have created 2 fd_sets : all_sockets , ready_sockets
