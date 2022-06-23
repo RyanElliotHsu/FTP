@@ -8,9 +8,55 @@
 #include <sys/time.h>
 #include <sys/select.h>
 
+#include "parseinput.h"
+
+#define clear() printf("\033[H\033[J")
 #define PORT 9007
 
+struct User
+{
+	char* username;
+	char* password;
+};
 
+void getAuth()
+{
+	FILE *file = fopen("user.txt", "r"); 
+    char *line = NULL; 
+    size_t len = 0; 
+    ssize_t lineSize;
+
+	//error check for opening file
+	if (file == NULL) { 
+        perror("fopen"); 
+        exit(EXIT_FAILURE); 
+    }
+
+	//iterate through lines
+	while ((lineSize = getline(&line, &len, file)) != -1) {
+
+		char** userArray = tokenizer(line);
+		if 
+        printf("Retrieved line of length %zu:\n", nread); 
+        fwrite(line, nread, 1, stdout); 
+    }
+}
+
+void userAuth(const char* username)
+{
+	
+
+
+}
+
+void passAuth(const char* password)
+{
+
+}
+
+// command[BUFFER];
+
+//recv()
 int main()
 {
 	int server_socket = socket(AF_INET,SOCK_STREAM,0);
@@ -127,6 +173,7 @@ int main()
 					char buffer[256];
 					bzero(buffer,sizeof(buffer));
 					int bytes = recv(fd,buffer,sizeof(buffer),0);
+					// user(bytes[1])
 					if(bytes==0)   //client has closed the connection
 					{
 						printf("connection closed from client side \n");

@@ -7,22 +7,27 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+#include "parseinput.h"
+
+
+#define clear() printf("\033[H\033[J")
 #define PORT 9007
 
-// Function for getting the current working directory and returning it as a string
-char* GettingUserWorkingDirectory(){
-  char * cwd = getcwd(NULL, 0);
-  return cwd;
-}
+// // Function for getting the current working directory and returning it as a string
+// char* GettingUserWorkingDirectory(){
+//   char * cwd = getcwd(NULL, 0);
+//   return cwd;
+// }
 
-// Function for printing the terminal user line (with $ and path)
-void UserPrompt(){
-  char *path = GettingUserWorkingDirectory();
-  printf("\n%s:%s$>>", getenv("USER"), path);
-}
+// // Function for printing the terminal user line (with $ and path)
+// void UserPrompt(){
+//   char *path = GettingUserWorkingDirectory();
+//   printf("\n%s:%s$>>", getenv("USER"), path);
+// }
 
 int main()
-{
+{   
+    char* command;
     printf("\n ----------------| FTP Server |----------------");
 	//create a socket
 	int network_socket;
@@ -51,31 +56,34 @@ int main()
         exit(EXIT_FAILURE);
     }
 	printf("\n Successfully connected to server ...\n ");
-	char buffer[256];
+	char buffer[1024];
 
 	while(1)
 	{
 		//request user for command
 		// UserPrompt();
 		//get input from user
-       printf("ftp>");
-       fgets(buffer,sizeof(buffer),stdin);
+        printf("ftp>");
+        command = readInput();
 
-       buffer[strcspn(buffer, "\n")] = 0;  //remove trailing newline char from buffer, fgets does not remove it
-       if(strcmp(buffer,"exit")==0)
+    //     fgets(command,sizeof(command),command);
+    //    command[strcspn(command, "\n")] = 0;  //remove trailing newline char from command, fgets does not remove it
+      
+      
+       if(strcmp(command,"exit")==0)
         {
-        	printf("closing the connection to server \n");
+            printf("closing the connection to server \n");
         	close(network_socket);
             break;
         }
         
-        if(send(network_socket,buffer,strlen(buffer),0)<0)
+        if(send(network_socket,command,strlen(command),0)<0)
         {
             perror("send");
             exit(EXIT_FAILURE);
         }
         
-        bzero(buffer,sizeof(buffer));			
+        bzero(command,sizeof(command));			
 	}
 
 	return 0;

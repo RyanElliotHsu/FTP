@@ -1,6 +1,6 @@
-shell: FTPserver.o FTPclient.o
-	gcc FTPserver.o -o FTPserver
-	gcc FTPclient.o -o FTPclient
+shell: parseinput.o FTPserver.o FTPclient.o
+	gcc parseinput.o FTPserver.o -o FTPserver
+	gcc parseinput.o FTPclient.o -o FTPclient
 
 FTPserver.o: FTPserver.c 
 	gcc -c FTPserver.c
@@ -8,14 +8,16 @@ FTPserver.o: FTPserver.c
 FTPclient.o: FTPclient.c 
 	gcc -c FTPclient.c
 
+parseinput.o: parseinput.c parseinput.h
+	gcc -c parseinput.c
+
 clean:
 	rm *.o shell
+
 
 # shell: print.o read.o splitter.o checkpipe.o singlecommand.o pipe.o server.o client.o
 # 	gcc print.o read.o splitter.o checkpipe.o singlecommand.o pipe.o server.o -o server
 # 	gcc print.o read.o splitter.o checkpipe.o singlecommand.o pipe.o client.o -o client
-
-
 
 # server.o: server.c server.h
 # 	gcc -c server.c

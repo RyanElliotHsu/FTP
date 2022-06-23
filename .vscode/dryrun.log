@@ -3,7 +3,7 @@ make: Entering directory `/Users/soumenmohanty/Documents/GitHub/Untitled'
 gcc -c FTPserver.c
  
 gcc -c FTPclient.c
-gcc FTPserver.o -o FTPserver
-gcc FTPclient.o -o FTPclient
+gcc parseinput.o FTPserver.o -o FTPserver
+gcc parseinput.o FTPclient.o -o FTPclient
 make: Leaving directory `/Users/soumenmohanty/Documents/GitHub/Untitled'
  
