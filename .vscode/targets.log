@@ -10,12 +10,13 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 make: *** No rule to make target `all'.  Stop.
 
 
-# Make data base, printed on Thu Jun 23 13:59:59 2022
+# Make data base, printed on Thu Jun 23 14:36:21 2022
 
 # Variables
 
 # automatic
 <D = $(patsubst %/,%,$(dir $<))
+ 
 # automatic
 ?F = $(notdir $?)
 # environment
@@ -38,8 +39,8 @@ VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupp
 _ = /usr/bin/make
 # environment
 FSLDIR = /usr/local/fsl
-# makefile
-MAKEFILE_LIST := 
+# makefile (from `Makefile', line 1)
+MAKEFILE_LIST :=  Makefile
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
@@ -107,7 +108,7 @@ MAKE_VERSION := 3.81
 # environment
 USER = soumenmohanty
 # makefile
-.DEFAULT_GOAL := 
+.DEFAULT_GOAL := shell
 # default
 MAKECMDGOALS := all
 # automatic
@@ -157,6 +158,7 @@ CONDA_PYTHON_EXE = /Users/soumenmohanty/opt/anaconda3/bin/python
 # default
 SUFFIXES := 
 # environment
+ 
 _CE_M = 
 # environment
 FSLWISH = /usr/local/fsl/bin/fslwish
@@ -171,7 +173,7 @@ _CE_CONDA =
 # environment
 LANG = C
 # variable set hash-table stats:
-# Load=78/1024=8%, Rehash=0, Collisions=4/98=4%
+# Load=78/1024=8%, Rehash=0, Collisions=4/101=4%
 
 # Pattern-specific Variable Values
 
@@ -179,15 +181,23 @@ LANG = C
 
 # Directories
 
-# . (device 16777230, inode 4471204): 9 files, no impossibilities.
+# . (device 16777230, inode 4471204): 17 files, no impossibilities.
 
-# 9 files, no impossibilities in 1 directories.
+# 17 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
 # No implicit rules.
 
 # Files
+
+FTPserver.o: FTPserver.c
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 6):
+	gcc -c FTPserver.c
+	
 
 # Not a target:
 all:
@@ -199,6 +209,12 @@ all:
 # Load=0/32=0%, Rehash=0, Collisions=0/0=0%
 
 # Not a target:
+FTPclient.c:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
 .SUFFIXES:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
@@ -206,23 +222,18 @@ all:
 
 # Not a target:
 Makefile:
-#  A default, MAKEFILES, or -include/sinclude makefile.
 #  Implicit rule search has been done.
-#  File does not exist.
+#  Last modified 2022-06-23 14:36:18
 #  File has been updated.
-#  Failed to be updated.
+#  Successfully updated.
 # variable set hash-table stats:
 # Load=0/32=0%, Rehash=0, Collisions=0/0=0%
 
 # Not a target:
-makefile:
-#  A default, MAKEFILES, or -include/sinclude makefile.
-#  Implicit rule search has been done.
-#  File does not exist.
-#  File has been updated.
-#  Failed to be updated.
-# variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+FTPserver.c:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
 
 # Not a target:
 .DEFAULT:
@@ -230,29 +241,44 @@ makefile:
 #  Modification time never checked.
 #  File has not been updated.
 
-# Not a target:
-GNUmakefile:
-#  A default, MAKEFILES, or -include/sinclude makefile.
-#  Implicit rule search has been done.
-#  File does not exist.
-#  File has been updated.
-#  Failed to be updated.
-# variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+clean:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 12):
+	rm *.o shell
+	
+
+shell: FTPserver.o FTPclient.o
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 2):
+	gcc FTPserver.o -o FTPserver
+	gcc FTPclient.o -o FTPclient
+	
+
+FTPclient.o: FTPclient.c
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 9):
+	gcc -c FTPclient.c
+	
 
 # files hash-table stats:
-# Load=6/1024=1%, Rehash=0, Collisions=0/17=0%
+# Load=10/1024=1%, Rehash=0, Collisions=1/26=4%
 # VPATH Search Paths
 
 # No `vpath' search paths.
 
 # No general (`VPATH' variable) search path.
 
-# # of strings in strcache: 0
-# # of strcache buffers: 0
-# strcache size: total = 0 / max = 0 / min = 4096 / avg = 0
-# strcache free: total = 0 / max = 0 / min = 4096 / avg = 0
+# # of strings in strcache: 1
+# # of strcache buffers: 1
+# strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
+# strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Thu Jun 23 13:59:59 2022
+# Finished Make data base on Thu Jun 23 14:36:21 2022
 
  

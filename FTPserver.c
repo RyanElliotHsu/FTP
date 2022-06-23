@@ -14,7 +14,7 @@
 int main()
 {
 	int server_socket = socket(AF_INET,SOCK_STREAM,0);
-	printf("Server fd = %d \n",server_socket);
+	// printf("Server fd = %d \n",server_socket);
 	
 	//check for fail error
 	if(server_socket<0)
@@ -63,7 +63,8 @@ int main()
 	FD_SET(server_socket,&all_sockets);
 
 
-	printf("Server is listening...\n");
+	printf("\n ----------------| FTP Server |----------------");
+	printf("\n Waiting for Client to join!");
 
 	while(1)
 	{		
@@ -112,7 +113,7 @@ int main()
 				{
 					//accept that new connection
 					int client_sd = accept(server_socket,0,0);
-					printf("Client Connected fd = %d \n",client_sd);
+					printf("\n Client Connected on file descriptor = %d \n",client_sd);
 					
 					//add the newly accepted socket to the set of all sockets that we are watching
 					FD_SET(client_sd,&all_sockets);

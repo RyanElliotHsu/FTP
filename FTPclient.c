@@ -9,9 +9,21 @@
 
 #define PORT 9007
 
+// Function for getting the current working directory and returning it as a string
+char* GettingUserWorkingDirectory(){
+  char * cwd = getcwd(NULL, 0);
+  return cwd;
+}
+
+// Function for printing the terminal user line (with $ and path)
+void UserPrompt(){
+  char *path = GettingUserWorkingDirectory();
+  printf("\n%s:%s$>>", getenv("USER"), path);
+}
 
 int main()
 {
+    printf("\n ----------------| FTP Server |----------------");
 	//create a socket
 	int network_socket;
 	network_socket = socket(AF_INET , SOCK_STREAM, 0);
@@ -38,13 +50,17 @@ int main()
         perror("connect");
         exit(EXIT_FAILURE);
     }
-	
+	printf("\n Successfully connected to server ...\n ");
 	char buffer[256];
 
 	while(1)
 	{
+		//request user for command
+		// UserPrompt();
 		//get input from user
+       printf("ftp>");
        fgets(buffer,sizeof(buffer),stdin);
+
        buffer[strcspn(buffer, "\n")] = 0;  //remove trailing newline char from buffer, fgets does not remove it
        if(strcmp(buffer,"exit")==0)
         {
