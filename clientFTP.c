@@ -28,20 +28,30 @@
 
 void commandrunner(char* command, char** tokens)
 {   
-    char* execute;
+    // if ()
+    // printf("compare working\n");
 
-    if (strcmp(tokens[0],"!PWD"))
+    // char runc = "pwd";
+    if (strcmp(tokens[0],"!PWD") == 0)
     {
-        execute = "pwd";
-        printf("compare working\n");
-
+        system("pwd");
+        // execl ("/bin/pwd", "pwd", NULL);
+    }
+    if (strcmp(tokens[0],"!LIST") == 0)
+    {
+        system("ls");
+    }
+    if (strcmp(tokens[0],"!CWD") == 0)
+    {   
+        char* run = "cd ";
+        // char args[] = tokens[1];
+        // printf("%s", args);
+        strcat(run, tokens[1]);
+        // run += tokens[1];
+        printf("#%s", run);
+        // system(run);
     }
 
-    if (execvp(execute[0], execute) == -1)
-    {
-      perror("Error");
-      exit(EXIT_FAILURE);
-    }
 }
 
 
@@ -113,8 +123,6 @@ int main()
             printf("Invalid Command! \n");
             continue;
         }
-
-        printf("Processing! \n");
         commandrunner(command, tokens);
         continue;
     }
