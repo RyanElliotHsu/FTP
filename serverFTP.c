@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <sys/select.h>
+#include <ctype.h>
 
 #include "parseinput.h"
 
@@ -18,12 +19,25 @@ int listSize = 0;
 
 struct User
 {
-	char* username;
-	char* password;
+	char username[16];
+	char password[16];
 	//char* path
 };
 
-void getAuth(struct User *userList)
+struct User userList[MAXUSER];
+
+struct User assignUser(char* username, char* password)
+{
+	struct User tempUser;
+
+	strcpy(tempUser.username,username);
+	strcpy(tempUser.password,password);
+	printf("\nASSN:%s,%s", tempUser.username, tempUser.password);
+
+	return tempUser;
+}
+
+void getAuth()
 {
 	FILE *file = fopen("user.txt", "r"); 
     char *line = NULL; 
@@ -36,28 +50,29 @@ void getAuth(struct User *userList)
         exit(EXIT_FAILURE); 
     }
 
+	// char** userArray;
 	//iterate through lines
 	while ((lineSize = getline(&line, &len, file)) != -1) {
-
-		struct User tempUser; 
-
-		char** userArray = tokenizer(line);
-
-		printf("\n#%s#%s#", userArray[0], userArray[1]);
-
-		userList[listSize].username = userArray[0];
-		userList[listSize].password = userArray[1];
 		
-		// tempUser.username = userArray[0];
-		// tempUser.password = userArray[1];
+		// printf("#%s#", line);
 
+		char **arg;
+		arg = tokenizer(line);
+
+	
+		printf("\n*%s*%s*", arg[0], arg[1]);
+
+		printf("\n%d\n", listSize);
+
+		userList[listSize] = assignUser(arg[0], arg[1]); 
+		
 		// printf("\n#%s#%s#", tempUser.username, tempUser.password);
 
-		// userList[listSize] = tempUser;
-		printf("$$$%s", userList[listSize].password);
 		listSize++;
     }
 }
+
+
 
 void userAuth(const char* username)
 {
@@ -78,9 +93,11 @@ int main()
 	printf("\n Waiting for Client to join!");
 
 	//read user.txt file
-	struct User userList[MAXUSER];
-	getAuth(userList);
-	printf("\n%s\n",userList[1].password);
+	getAuth();
+
+	for (int i=0; i<=listSize; ++i){
+		printf("\nLIST:%s,%s", userList[i].username, userList[i].password);
+	}
 	// for(int i = 0; i<listSize; i++)
 	// {
 	// 	printf("\n %s, %s \n", userList[i].password, userList[i].username);

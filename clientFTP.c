@@ -78,17 +78,13 @@ int main()
         }
         
         // if ()
-        if(send(network_socket,command,strlen(command),0)<0)
-        {
-            perror("send");
-            exit(EXIT_FAILURE);
-        }
-        bzero(command,sizeof(command));			
-	}
-    
+        // if(send(network_socket,command,strlen(command),0)<0)
+        // {
+        //     perror("send");
+        //     exit(EXIT_FAILURE);
+        // }
+        // bzero(command,sizeof(command));			
     char **tokens = tokenizer(command);
-
-    printf("\n\n%s\n\n", tokens[0], tokens[1]);
 
     if((strcmp(tokens[0],"USER")==0) || (strcmp(tokens[0],"PASS")==0))
     {
@@ -110,6 +106,11 @@ int main()
     {
         printf("Invalid Command! \n");
     }
+
+
+    // recv()
+	}
+    
     
     // else if (!cwd) or (!pwd)
     // {
