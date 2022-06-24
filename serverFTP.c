@@ -21,6 +21,8 @@ struct User
 {
 	char username[16];
 	char password[16];
+	int usernameFlag;
+	int loginFlag;
 	//char* path
 };
 
@@ -30,6 +32,9 @@ struct User assignUser(char* username, char* password)
 {
 	struct User tempUser;
 
+	//default username and login state is 0
+	tempUser.usernameFlag = 0;
+	tempUser.loginFlag = 0;
 	strcpy(tempUser.username,username);
 	strcpy(tempUser.password,password);
 	printf("\nASSN:%s,%s", tempUser.username, tempUser.password);
@@ -72,16 +77,32 @@ void getAuth()
     }
 }
 
-
-
 void userAuth(const char* username)
 {
-	
+	for (int i=0; i<listSize; i++)
+	{	
+		//username found
+		if (username==userList[i].username)
+		{
+			break;
+		}
+	}
+
+	printf("Username does not exist..");
 }
 
-void passAuth(const char* password)
+void passAuth(int userNum, const char* password)
 {
+	if (password==userList[userNum].password)
+	{
+		//password is correct
+		
+	}
 
+	else
+	{
+		printf("Incorrect password..");
+	}
 }
 
 // command[BUFFER];
