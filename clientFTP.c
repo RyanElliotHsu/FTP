@@ -25,6 +25,16 @@
 //   printf("\n%s:%s$>>", getenv("USER"), path);
 // }
 
+void commandrunner(char* command)
+{
+    if (execvp(command[0], command) == -1)
+    {
+      perror("Error");
+      exit(EXIT_FAILURE);
+    }
+}
+
+
 int main()
 {   
     clear();
@@ -86,15 +96,26 @@ int main()
         // bzero(command,sizeof(command));			
     char **tokens = tokenizer(command);
 
+    if (strstr(tokens[0], "!") == tokens[0]) {
+        if (!(strcmp(tokens[0],"!CWD")==0) && !(strcmp(tokens[0],"!PWD")==0) && !(strcmp(tokens[0],"!LIST")==0))
+        {
+            printf("Invalid Command! \n");
+            continue;
+        }
+
+        printf("Processing! \n");
+        continue;
+    }
+
     if((strcmp(tokens[0],"USER")==0) || (strcmp(tokens[0],"PASS")==0))
     {
         send(network_socket,command,strlen(command),0);
     }
-    else if((strcmp(tokens[0],"RETR")==0) || (strcmp(tokens[0],"STOR")==0) ||(strcmp(tokens[0],"LIST")==0) )
+    else if((strcmp(tokens[0],"RETR")==0) || (strcmp(tokens[0],"STOR")==0) )
     {
         send(network_socket,command,strlen(command),0);
     }
-    else if((strcmp(tokens[0],"CWD")==0) || (strcmp(tokens[0],"PWD")==0))
+    else if((strcmp(tokens[0],"CWD")==0) || (strcmp(tokens[0],"PWD")==0) || (strcmp(tokens[0],"LIST")==0))
     {
         send(network_socket,command,strlen(command),0);
     }
@@ -108,16 +129,7 @@ int main()
     }
 
 
-    // recv()
 	}
-    
-    
-    // else if (!cwd) or (!pwd)
-    // {
-    //     exec...
-    // }
-    // else    
-    //     print invalid command
 
 	return 0;
 }
