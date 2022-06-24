@@ -30,12 +30,14 @@ void commandrunner(char* command, char** tokens)
 {   
     char* execute;
 
-    if strcmp(tokens[0],"!PWD")
+    if (strcmp(tokens[0],"!PWD"))
     {
-        execute = "PWD"
+        execute = "pwd";
+        printf("compare working\n");
+
     }
 
-    if (execvp(command[0], command) == -1)
+    if (execvp(execute[0], execute) == -1)
     {
       perror("Error");
       exit(EXIT_FAILURE);
@@ -112,8 +114,8 @@ int main()
             continue;
         }
 
-        commandrunner(command, tokens);
         printf("Processing! \n");
+        commandrunner(command, tokens);
         continue;
     }
 

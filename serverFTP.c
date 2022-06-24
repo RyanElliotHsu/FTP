@@ -113,7 +113,6 @@ int main()
 
 
 	for (int i=0; i<listSize; ++i){
-		if (FD == userList.FDflag
 		printf("\nLIST:%s,%s", userList[i].username, userList[i].password);
 	}
 	
@@ -233,7 +232,6 @@ int main()
 					if (strcmp(buffer, "CWD") == 0)
 					{ // comapring the command entered to the exit string
 						send(fd, "HELLO", sizeof("HELLO"), 0);
-						if 
 					}
 
 					if (strcmp(buffer, "PWD") == 0)
