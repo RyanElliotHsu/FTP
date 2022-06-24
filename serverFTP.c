@@ -20,14 +20,9 @@ int listSize = 0;
 
 struct User
 {
-<<<<<<< Updated upstream
 	char username[16];
 	char password[16];
 	int usernameFlag;
-=======
-	char username[32];
-	char password[32];
->>>>>>> Stashed changes
 	int loginFlag;
 	//char* path
 };
@@ -37,13 +32,10 @@ struct User userList[MAXUSER];
 struct User assignUser(char* username, char* password)
 {
 	struct User tempUser;
-<<<<<<< Updated upstream
 
 	//default username and login state is 0
 	tempUser.usernameFlag = 0;
 	tempUser.loginFlag = 0;
-=======
->>>>>>> Stashed changes
 	strcpy(tempUser.username,username);
 	strcpy(tempUser.password,password);
 	return tempUser;
@@ -121,6 +113,7 @@ int main()
 
 
 	for (int i=0; i<listSize; ++i){
+		if (FD == userList.FDflag
 		printf("\nLIST:%s,%s", userList[i].username, userList[i].password);
 	}
 	
@@ -235,6 +228,19 @@ int main()
 					char buffer[MAX_BUFFER];
 					bzero(buffer,sizeof(buffer));
 					int bytes = recv(fd,buffer,sizeof(buffer),0);
+
+					
+					if (strcmp(buffer, "CWD") == 0)
+					{ // comapring the command entered to the exit string
+						send(fd, "HELLO", sizeof("HELLO"), 0);
+						if 
+					}
+
+					if (strcmp(buffer, "PWD") == 0)
+					{ // comapring the command entered to the exit string
+						send(fd, "GOODBYE", sizeof("GOODBYE"), 0);
+					}
+					
 					// user(bytes[1])
 					if(bytes==0)   //client has closed the connection
 					{
@@ -246,6 +252,10 @@ int main()
 						//once we are done handling the connection, remove the socket from the list of file descriptors that we are watching
 						FD_CLR(fd,&all_sockets);
 						
+						//if condiitons here
+							// { send(fd, buffer)}
+
+
 					}
 					//displaying the message received 
 					printf("%s \n",buffer);

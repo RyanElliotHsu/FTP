@@ -12,6 +12,7 @@
 
 #define clear() printf("\033[H\033[J")
 #define PORT 9007
+#define BUFFER_SIZE 2048
 
 // // Function for getting the current working directory and returning it as a string
 // char* GettingUserWorkingDirectory(){
@@ -25,8 +26,15 @@
 //   printf("\n%s:%s$>>", getenv("USER"), path);
 // }
 
-void commandrunner(char* command)
-{
+void commandrunner(char* command, char** tokens)
+{   
+    char* execute;
+
+    if strcmp(tokens[0],"!PWD")
+    {
+        execute = "PWD"
+    }
+
     if (execvp(command[0], command) == -1)
     {
       perror("Error");
@@ -36,7 +44,9 @@ void commandrunner(char* command)
 
 
 int main()
-{   
+{       
+    char bufferc[BUFFER_SIZE];
+
     clear();
     char* command;
     printf("\n ----------------| FTP Client |----------------");
@@ -76,7 +86,6 @@ int main()
 		//get input from user
         printf("ftp>");
         command = readInput();
-
     //     fgets(command,sizeof(command),command);
     //    command[strcspn(command, "\n")] = 0;  //remove trailing newline char from command, fgets does not remove it
       
@@ -103,6 +112,7 @@ int main()
             continue;
         }
 
+        commandrunner(command, tokens);
         printf("Processing! \n");
         continue;
     }
@@ -128,10 +138,11 @@ int main()
         printf("Invalid Command! \n");
     }
 
-<<<<<<< Updated upstream
+    bzero(bufferc, BUFFER_SIZE);                        // Clearing the buffer back to the buffer size
+    recv(network_socket, bufferc, sizeof(bufferc), 0); // Client receiving the buffer output from the server
+    printf("%s\n", bufferc);                              // print the buffer from the server on the client screen
+    bufferc[0] = '\0';
 
-=======
->>>>>>> Stashed changes
 	}
 
 	return 0;
