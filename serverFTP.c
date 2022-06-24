@@ -227,16 +227,45 @@ int main()
 					char buffer[MAX_BUFFER];
 					bzero(buffer,sizeof(buffer));
 					int bytes = recv(fd,buffer,sizeof(buffer),0);
-
+					//tokenize buffer to separate command items
+					char** commandToken = tokenizer(buffer);
 					
-					if (strcmp(buffer, "CWD") == 0)
-					{ // comapring the command entered to the exit string
+					if (strcmp(commandToken[0], "CWD") == 0)
+					{
 						send(fd, "HELLO", sizeof("HELLO"), 0);
 					}
 
-					if (strcmp(buffer, "PWD") == 0)
-					{ // comapring the command entered to the exit string
+					else if (strcmp(commandToken[0], "PWD") == 0)
+					{
 						send(fd, "GOODBYE", sizeof("GOODBYE"), 0);
+					}
+
+					else if (strcmp(commandToken[0], "USER") == 0)
+					{
+						userAuth(commandToken[1]);
+						//we also need to pass in client fd so they can store it in user list
+					}
+
+					else if (strcmp(commandToken[0], "PASS") == 0)
+					{
+						//first check if username auth is passsed and pass in user number
+						int usernumber;
+						passAuth(commandToken[1], usernumber);	//usernumber not yet assigned
+					}
+
+					else if (strcmp(commandToken[0], "STOR") == 0)
+					{
+					
+					}
+
+					else if (strcmp(commandToken[0], "RETR") == 0)
+					{
+					
+					}
+
+					else if (strcmp(commandToken[0], "LIST") == 0)
+					{
+					
 					}
 					
 					// user(bytes[1])
