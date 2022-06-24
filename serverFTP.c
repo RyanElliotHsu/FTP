@@ -14,14 +14,20 @@
 #define clear() printf("\033[H\033[J")
 #define PORT 9007
 #define MAXUSER 100
+#define MAX_BUFFER 2048
 
 int listSize = 0;
 
 struct User
 {
+<<<<<<< Updated upstream
 	char username[16];
 	char password[16];
 	int usernameFlag;
+=======
+	char username[32];
+	char password[32];
+>>>>>>> Stashed changes
 	int loginFlag;
 	//char* path
 };
@@ -31,14 +37,15 @@ struct User userList[MAXUSER];
 struct User assignUser(char* username, char* password)
 {
 	struct User tempUser;
+<<<<<<< Updated upstream
 
 	//default username and login state is 0
 	tempUser.usernameFlag = 0;
 	tempUser.loginFlag = 0;
+=======
+>>>>>>> Stashed changes
 	strcpy(tempUser.username,username);
 	strcpy(tempUser.password,password);
-	printf("\nASSN:%s,%s", tempUser.username, tempUser.password);
-
 	return tempUser;
 }
 
@@ -63,11 +70,6 @@ void getAuth()
 
 		char **arg;
 		arg = tokenizer(line);
-
-	
-		printf("\n*%s*%s*", arg[0], arg[1]);
-
-		printf("\n%d\n", listSize);
 
 		userList[listSize] = assignUser(arg[0], arg[1]); 
 		
@@ -110,19 +112,17 @@ void passAuth(int userNum, const char* password)
 //recv()
 int main()
 {	
+	clear();
 	printf("\n ----------------| FTP Server |----------------");
 	printf("\n Waiting for Client to join!");
 
 	//read user.txt file
 	getAuth();
 
-	for (int i=0; i<=listSize; ++i){
+
+	for (int i=0; i<listSize; ++i){
 		printf("\nLIST:%s,%s", userList[i].username, userList[i].password);
 	}
-	// for(int i = 0; i<listSize; i++)
-	// {
-	// 	printf("\n %s, %s \n", userList[i].password, userList[i].username);
-	// }
 	
 	int server_socket = socket(AF_INET,SOCK_STREAM,0);
 	// printf("Server fd = %d \n",server_socket);
@@ -174,7 +174,8 @@ int main()
 	FD_SET(server_socket,&all_sockets);
 
 	while(1)
-	{		
+	{	
+
 		//notice so far, we have created 2 fd_sets : all_sockets , ready_sockets
 		//but we have only used the all_sockets and didn't touch the ready_sockets
 		//that is because select() is destructive: it's going to change the set we pass in 
@@ -231,13 +232,13 @@ int main()
 				//in this case, we just want to read its data
 				else
 				{
-					char buffer[256];
+					char buffer[MAX_BUFFER];
 					bzero(buffer,sizeof(buffer));
 					int bytes = recv(fd,buffer,sizeof(buffer),0);
 					// user(bytes[1])
 					if(bytes==0)   //client has closed the connection
 					{
-						printf("connection closed from client side \n");
+						printf("Client dieconnected.. \n");
 						
 						//we are done, close fd
 						close(fd);

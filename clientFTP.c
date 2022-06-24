@@ -128,7 +128,10 @@ int main()
         printf("Invalid Command! \n");
     }
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 	}
 
 	return 0;
