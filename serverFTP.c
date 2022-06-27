@@ -232,19 +232,22 @@ int main()
 				{
 					char buffer[MAX_BUFFER];
 					bzero(buffer,sizeof(buffer));
-					int bytes = recv(fd,buffer,sizeof(buffer),0);
 
-					printf("\nBUFFER:$%s$\n",buffer);
+					int bytes = recv(fd,buffer,sizeof(buffer),0);
+					printf("\nBUFFER:$%s$\n", buffer);
 
 
 					char *buffer_cpy = malloc(strlen(buffer) + 1);
+
+					// char buffer_cpy[MAX_BUFFER];
     				strcpy(buffer_cpy, buffer);
 
 					//tokenize buffer to separate command items
 					char** commandToken = tokenizer(buffer_cpy);
 
 					printf("%d", fd);
-
+					
+					
 					if (strcmp(commandToken[0], "CWD") == 0)
 					{
 						send(fd, "HELLO", sizeof("HELLO"), 0);
@@ -283,6 +286,7 @@ int main()
 					
 					}
 					
+					
 					// user(bytes[1])
 					if(bytes==0)   //client has closed the connection
 					{
@@ -300,9 +304,13 @@ int main()
 
 					}
 					//displaying the message received 
+
+					free(buffer_cpy); 	
+					free(commandToken);
 				}
 			}
 		}
+
 
 	}
 
