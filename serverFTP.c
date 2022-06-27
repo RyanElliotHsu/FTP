@@ -75,7 +75,6 @@ void getAuth()
 
 void userAuth(const char* username, int usernumber)
 {
-	printf("%s", username);
 	for (int i=0; i<listSize; i++)
 	{	
 		//username found
@@ -246,9 +245,29 @@ int main()
 					//tokenize buffer to separate command items
 					char** commandToken = tokenizer(buffer_cpy);
 
-					printf("%d", fd);   
+					// printf("%d", fd);   
 					
+					int user_flag = 0, pass_flag=0;
+
+					for (int i=0; i<listSize; i++){
+						if ((userList[listSize].userFD == fd))
+						{
+							// username linked to client 
+							user_flag = 0;
+							
+							
+						} 
+						// user not linked, ask for username
+					}
+
+					//first check if the user is logged in 
+					if ((strcmp(commandToken[0], "USER") == 0) || ())
+					{
+						userAuth(commandToken[1], fd);
+						//we also need to pass in client fd so they can store it in user list
+					}
 					
+
 					if (strcmp(commandToken[0], "CWD") == 0)
 					{
 						send(fd, "HELLO", sizeof("HELLO"), 0);
@@ -259,11 +278,7 @@ int main()
 						send(fd, "GOODBYE", sizeof("GOODBYE"), 0);
 					}
 
-					else if (strcmp(commandToken[0], "USER") == 0)
-					{
-						userAuth(commandToken[1], fd);
-						//we also need to pass in client fd so they can store it in user list
-					}
+					
 
 					else if (strcmp(commandToken[0], "PASS") == 0)
 					{
