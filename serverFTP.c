@@ -24,6 +24,7 @@ struct User
 	char password[16];
 	int usernameFlag;
 	int loginFlag;
+	int userFD;
 	//char* path
 };
 
@@ -71,18 +72,21 @@ void getAuth()
     }
 }
 
-void userAuth(const char* username)
+void userAuth(const char* username, int usernumber)
 {
+	printf("%s", username);
 	for (int i=0; i<listSize; i++)
 	{	
 		//username found
 		if (username==userList[i].username)
 		{
+			userList[i].userFD = usernumber;
+			printf("\nLogged in as %s..", username);
 			break;
 		}
 	}
 
-	printf("Username does not exist..");
+	printf("\n Username does not exist..");
 }
 
 void passAuth(int userNum, const char* password)
@@ -212,6 +216,8 @@ int main()
 				if(fd==server_socket)
 				{
 					//accept that new connection
+					printf("\n %d", server_socket);
+
 					int client_sd = accept(server_socket,0,0);
 					printf("\n Client Connected on file descriptor = %d \n",client_sd);
 					
@@ -227,9 +233,18 @@ int main()
 					char buffer[MAX_BUFFER];
 					bzero(buffer,sizeof(buffer));
 					int bytes = recv(fd,buffer,sizeof(buffer),0);
+
+					printf("\nBUFFER:$%s$\n",buffer);
+
+
+					char *buffer_cpy = malloc(strlen(buffer) + 1);
+    				strcpy(buffer_cpy, buffer);
+
 					//tokenize buffer to separate command items
-					char** commandToken = tokenizer(buffer);
-					
+					char** commandToken = tokenizer(buffer_cpy);
+
+					printf("%d", fd);
+
 					if (strcmp(commandToken[0], "CWD") == 0)
 					{
 						send(fd, "HELLO", sizeof("HELLO"), 0);
@@ -242,14 +257,14 @@ int main()
 
 					else if (strcmp(commandToken[0], "USER") == 0)
 					{
-						userAuth(commandToken[1]);
+						userAuth(commandToken[1], fd);
 						//we also need to pass in client fd so they can store it in user list
 					}
 
 					else if (strcmp(commandToken[0], "PASS") == 0)
 					{
 						//first check if username auth is passsed and pass in user number
-						int usernumber;
+						int usernumber = fd;
 						passAuth(commandToken[1], usernumber);	//usernumber not yet assigned
 					}
 
@@ -285,7 +300,6 @@ int main()
 
 					}
 					//displaying the message received 
-					printf("%s \n",buffer);
 				}
 			}
 		}

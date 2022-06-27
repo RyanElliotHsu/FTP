@@ -34,9 +34,12 @@ void commandrunner(char* command, char** tokens)
     // char runc = "pwd";
     if (strcmp(tokens[0],"!PWD") == 0)
     {
+        printf("CLIENT: ");
+        printf("");
         system("pwd");
         // execl ("/bin/pwd", "pwd", NULL);
     }
+
     if (strcmp(tokens[0],"!LIST") == 0)
     {
         system("ls");
@@ -114,7 +117,13 @@ int main()
         //     perror("send");
         //     exit(EXIT_FAILURE);
         // }
-        // bzero(command,sizeof(command));			
+        // bzero(command,sizeof(command));
+
+
+    char *rawcommand = malloc(strlen(command) + 1);
+
+    strcpy(rawcommand, command);
+
     char **tokens = tokenizer(command);
 
     if (strstr(tokens[0], "!") == tokens[0]) {
@@ -126,6 +135,10 @@ int main()
         commandrunner(command, tokens);
         continue;
     }
+
+    send(network_socket,rawcommand,strlen(rawcommand),0);
+
+    printf("$%s$\n", rawcommand);
 
     if((strcmp(tokens[0],"USER")==0) || (strcmp(tokens[0],"PASS")==0))
     {
@@ -149,7 +162,7 @@ int main()
     }
 
     bzero(bufferc, BUFFER_SIZE);                        // Clearing the buffer back to the buffer size
-    recv(network_socket, bufferc, sizeof(bufferc), 0); // Client receiving the buffer output from the server
+    recv(network_socket, bufferc, sizeof(bufferc), MSG_DONTWAIT); // Client receiving the buffer output from the server
     printf("%s\n", bufferc);                              // print the buffer from the server on the client screen
     bufferc[0] = '\0';
 
