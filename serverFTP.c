@@ -39,6 +39,7 @@ struct User assignUser(char* username, char* password)
 	tempUser.loginFlag = 0;
 	strcpy(tempUser.username,username);
 	strcpy(tempUser.password,password);
+
 	return tempUser;
 }
 
@@ -78,7 +79,7 @@ void userAuth(const char* username, int usernumber)
 	for (int i=0; i<listSize; i++)
 	{	
 		//username found
-		if (username==userList[i].username)
+		if (strcmp(username,userList[i].username)==0)
 		{
 			userList[i].userFD = usernumber;
 			printf("\nLogged in as %s..", username);
@@ -86,17 +87,16 @@ void userAuth(const char* username, int usernumber)
 		}
 	}
 
-	printf("\n Username does not exist..");
+	// printf("\n Username does not exist..");
 }
 
-void passAuth(int userNum, const char* password)
+void passAuth(const char* password, int userNum)
 {
-	if (password==userList[userNum].password)
+	if (strcmp(password,userList[userNum].password)==0)
 	{
 		//password is correct
 		
 	}
-
 	else
 	{
 		printf("Incorrect password..");
@@ -205,6 +205,8 @@ int main()
 		//go from 0 to FD_SETSIZE (the largest number of file descriptors that we can store in an fd_set)
 		for(int fd = 0 ; fd < FD_SETSIZE; fd++)
 		{
+			// printf("\nFD: %d / %d", fd, FD_SETSIZE);
+
 			//check to see if that fd is SET
 			if(FD_ISSET(fd,&ready_sockets))
 			{
@@ -231,11 +233,10 @@ int main()
 				else
 				{
 					char buffer[MAX_BUFFER];
+
 					bzero(buffer,sizeof(buffer));
-
-					int bytes = recv(fd,buffer,sizeof(buffer),0);
+					int bytes = recv(fd, buffer,sizeof(buffer), 0);
 					printf("\nBUFFER:$%s$\n", buffer);
-
 
 					char *buffer_cpy = malloc(strlen(buffer) + 1);
 
@@ -245,7 +246,7 @@ int main()
 					//tokenize buffer to separate command items
 					char** commandToken = tokenizer(buffer_cpy);
 
-					printf("%d", fd);
+					printf("%d", fd);   
 					
 					
 					if (strcmp(commandToken[0], "CWD") == 0)
@@ -267,8 +268,7 @@ int main()
 					else if (strcmp(commandToken[0], "PASS") == 0)
 					{
 						//first check if username auth is passsed and pass in user number
-						int usernumber = fd;
-						passAuth(commandToken[1], usernumber);	//usernumber not yet assigned
+						passAuth(commandToken[1], fd);	//usernumber not yet assigned
 					}
 
 					else if (strcmp(commandToken[0], "STOR") == 0)

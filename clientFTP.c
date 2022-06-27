@@ -63,7 +63,6 @@ int main()
     char bufferc[BUFFER_SIZE];
 
     clear();
-    char* command;
     printf("\n ----------------| FTP Client |----------------");
 	//create a socket
 	int network_socket;
@@ -91,18 +90,23 @@ int main()
         perror("connect");
         exit(EXIT_FAILURE);
     }
-	printf("\n Successfully connected to server ...\n ");
+	printf("\n Successfully connected to server ...\n");
 	char buffer[1024];
 
 	while(1)
 	{
+        char* command;
 		//request user for command
 		// UserPrompt();
 		//get input from user
-        printf("ftp>");
+        printf(" ftp>");
         command = readInput();
-    //     fgets(command,sizeof(command),command);
-    //    command[strcspn(command, "\n")] = 0;  //remove trailing newline char from command, fgets does not remove it
+        if (command[0] == '\0') // If the command is empty meaning the user has pressed enter then we continue and loop back
+        {
+        continue;
+        }
+        //     fgets(command,sizeof(command),command);
+        //    command[strcspn(command, "\n")] = 0;  //remove trailing newline char from command, fgets does not remove it
       
        if(strcmp(command,"exit")==0)
         {
@@ -121,52 +125,55 @@ int main()
 
 
 
-    char *rawcommand = malloc(strlen(command) + 1);
-    strcpy(rawcommand, command);
+        char *rawcommand = malloc(strlen(command) + 1);
+        strcpy(rawcommand, command);
 
-    char **tokens = tokenizer(command);
+        char **tokens = tokenizer(command);
 
-    if (strstr(tokens[0], "!") == tokens[0]) {
-        if (!(strcmp(tokens[0],"!CWD")==0) && !(strcmp(tokens[0],"!PWD")==0) && !(strcmp(tokens[0],"!LIST")==0))
-        {
-            printf("Invalid Command! \n");
+        if (strstr(tokens[0], "!") == tokens[0]) {
+            if (!(strcmp(tokens[0],"!CWD")==0) && !(strcmp(tokens[0],"!PWD")==0) && !(strcmp(tokens[0],"!LIST")==0))
+            {
+                printf("Invalid Command! \n");
+                continue;
+            }
+            commandrunner(command, tokens);
             continue;
         }
-        commandrunner(command, tokens);
-        continue;
-    }
 
-    printf("$%s$\n", rawcommand);
-    send(network_socket,rawcommand,strlen(rawcommand),0);
+        printf("$%s$\n", rawcommand);
 
-    
+        // send(network_socket,rawcommand,strlen(rawcommand)+1,0);
 
-    if((strcmp(tokens[0],"USER")==0) || (strcmp(tokens[0],"PASS")==0))
-    {
-        send(network_socket,rawcommand,strlen(rawcommand),0);
-    }
-    else if((strcmp(tokens[0],"RETR")==0) || (strcmp(tokens[0],"STOR")==0) )
-    {
-        send(network_socket,rawcommand,strlen(rawcommand),0);
-    }
-    else if((strcmp(tokens[0],"CWD")==0) || (strcmp(tokens[0],"PWD")==0) || (strcmp(tokens[0],"LIST")==0))
-    {
-        send(network_socket,rawcommand,strlen(rawcommand),0);
-    }
-    else if(strcmp(tokens[0],"QUIT")==0)
-    {
-        send(network_socket,rawcommand,strlen(rawcommand),0);
-    }
-    else
-    {
-        printf("Invalid Command! \n");
-    }
+        
+        if((strcmp(tokens[0],"USER")==0) || (strcmp(tokens[0],"PASS")==0))
+        {
+            send(network_socket,rawcommand,strlen(rawcommand),0);
+        }
+        else if((strcmp(tokens[0],"RETR")==0) || (strcmp(tokens[0],"STOR")==0) )
+        {
+            send(network_socket,rawcommand,strlen(rawcommand),0);
+        }
+        else if((strcmp(tokens[0],"CWD")==0) || (strcmp(tokens[0],"PWD")==0) || (strcmp(tokens[0],"LIST")==0))
+        {
+            send(network_socket,rawcommand,strlen(rawcommand),0);
+        }
+        else if(strcmp(tokens[0],"QUIT")==0)
+        {
+            send(network_socket,rawcommand,strlen(rawcommand),0);
+        }
+        else
+        {
+            printf("Invalid Command! \n");
+        }
 
-    bzero(bufferc, BUFFER_SIZE);                        // Clearing the buffer back to the buffer size
-    recv(network_socket, bufferc, sizeof(bufferc), MSG_DONTWAIT); // Client receiving the buffer output from the server
-    printf("%s\n", bufferc);                              // print the buffer from the server on the client screen
-    bufferc[0] = '\0';
+        bzero(bufferc, BUFFER_SIZE);                        // Clearing the buffer back to the buffer size
+        recv(network_socket, bufferc, sizeof(bufferc), MSG_DONTWAIT); // Client receiving the buffer output from the server
+        printf("%s\n", bufferc);                              // print the buffer from the server on the client screen
+        bufferc[0] = '\0';
 
+        free(command);
+        free(tokens);
+        free(rawcommand);
 	}
 
 	return 0;
