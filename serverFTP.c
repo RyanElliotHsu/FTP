@@ -254,20 +254,25 @@ int main()
 				//in this case, we just want to read its data
 				else
 				{
+
+					printf("#");
+
 					char buffer[MAX_BUFFER];
 
 					bzero(buffer,sizeof(buffer));
+					printf("$");
 					int bytes = recv(fd, buffer,sizeof(buffer), 0);
 					printf("\n SOCKET %d : %s", fd, buffer);
-
+					
 					char *buffer_cpy = malloc(strlen(buffer) + 1);
-
+					
+					printf("#");
 					// char buffer_cpy[MAX_BUFFER];
     				strcpy(buffer_cpy, buffer);
 
 					//tokenize buffer to separate command items
 					char** commandToken = tokenizer(buffer_cpy);
-
+printf("#");
 					int user_flag = 0, login_flag=0, recordNum = -1;
 
 					for (int i=0; i<listSize; i++){
@@ -287,7 +292,7 @@ int main()
 							}
 						} 
 					}
-					
+					printf("#");
 
 					// if (strcmp(commandToken[0], "QUIT") == 0)
 					// {
@@ -373,30 +378,30 @@ int main()
 						}
 					}
 
-					// if (user_flag)
-					// {
-					// 	if (userList[recordNum].loginFlag == 1)
-					// 	{
-					// 		// user is logged in and can now use 
-					// 	}
-					// 	else
-					// 	{
-					// 		char* send_msg = " Please enter PASSWORD";
-					// 		printf("%s \n", send_msg);
-					// 		send(fd, send_msg, 23, 0);
-					// 	}
-					// }
-					// else{
-					// 	char* send_msg = " Please enter USER";
-					// 	printf("%s \n", send_msg);
-					// 	send(fd, send_msg, 19, 0);
 					
 					// user(bytes[1])
-					
+					if(bytes==0)   //client has closed the connection
+					{
+						printf("Client disconnected.. \n");
+						
+						userList[recordNum].loginFlag = 0;
+						userList[recordNum].usernameFlag = 0;
+						userList[recordNum].userFD = -1;
+						//we are done, close fd
+						close(fd);
+
+
+						//once we are done handling the connection, remove the socket from the list of file descriptors that we are watching
+						FD_CLR(fd,&all_sockets);
+						
+						//if condiitons here
+							// { send(fd, buffer)}
+
+					}
 
 					free(buffer_cpy); 	
 					free(commandToken);
-										printRecords();
+					printRecords();
 
 				}
 			}
