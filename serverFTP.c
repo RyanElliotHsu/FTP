@@ -37,11 +37,15 @@ struct User assignUser(char* username, char* password)
 	//default username and login state is 0
 	tempUser.usernameFlag = 0;
 	tempUser.loginFlag = 0;
+	tempUser.userFD = -1;
+
 	strcpy(tempUser.username,username);
 	strcpy(tempUser.password,password);
 
 	return tempUser;
 }
+
+// void send_msg(char* string, )
 
 void getAuth()
 {
@@ -71,53 +75,72 @@ void getAuth()
 
 		listSize++;
     }
+
+	printf("\n Loaded authentication file ...");
 }
 
-void userAuth(const char* username, int usernumber)
+int userAuth(const char* username, int usernumber)
 {
 	for (int i=0; i<listSize; i++)
 	{	
 		//username found
-		if (strcmp(username,userList[i].username)==0)
+		if ((strcmp(username,userList[i].username)==0)&&(userList[i].userFD == -1))
 		{
 			userList[i].userFD = usernumber;
-			printf("\nLogged in as %s..", username);
-			break;
+			userList[i].usernameFlag = 1;
+			printf("\nUser found");
+			
+			return 1;
 		}
 	}
-
-	// printf("\n Username does not exist..");
+		printf("\nUser not found");
+		return 0;
 }
 
-void passAuth(const char* password, int userNum)
+int passAuth(const char* password, int userNum)
 {
 	if (strcmp(password,userList[userNum].password)==0)
 	{
-		//password is correct
-		
+		userList[userNum].loginFlag = 1;
+		printf("\nPassword Correct");
+		return 1;
 	}
 	else
 	{
 		printf("Incorrect password..");
+		return 0;
 	}
 }
 
-// command[BUFFER];
+void send_to_client(int fd, char* message)
+{
+	int size = strlen(message) + 1;
+	send(fd, message, size, 0);
+}
 
-//recv()
+void printRecords(){
+	for(int i = 0; i < listSize; ++i)
+	{
+		// if (userList[i].userFD == fd){
+			printf("\n || User: %s | Pass: %s | USER: %d | PASS: %d | FD: %d||", userList[i].username, userList[i].password, userList[i].usernameFlag, userList[i].loginFlag, userList[i].userFD);
+		// }
+	}
+}
+
 int main()
 {	
 	clear();
 	printf("\n ----------------| FTP Server |----------------");
-	printf("\n Waiting for Client to join!");
+	printf("\n Waiting for Client to join...");
 
 	//read user.txt file
 	getAuth();
 
 
-	for (int i=0; i<listSize; ++i){
-		printf("\nLIST:%s,%s", userList[i].username, userList[i].password);
-	}
+	// For loop for debugging authtext file to server
+	// for (int i=0; i<listSize; ++i){
+	// 	printf("\nLIST:%s,%s", userList[i].username, userList[i].password);
+	// }
 	
 	int server_socket = socket(AF_INET,SOCK_STREAM,0);
 	// printf("Server fd = %d \n",server_socket);
@@ -217,10 +240,10 @@ int main()
 				if(fd==server_socket)
 				{
 					//accept that new connection
-					printf("\n %d", server_socket);
+					// printf("\n %d", server_socket);
 
 					int client_sd = accept(server_socket,0,0);
-					printf("\n Client Connected on file descriptor = %d \n",client_sd);
+					printf("\n Client Connected on file descriptor %d ...\n",client_sd);
 					
 					//add the newly accepted socket to the set of all sockets that we are watching
 					FD_SET(client_sd,&all_sockets);
@@ -235,7 +258,7 @@ int main()
 
 					bzero(buffer,sizeof(buffer));
 					int bytes = recv(fd, buffer,sizeof(buffer), 0);
-					printf("\nBUFFER:$%s$\n", buffer);
+					printf("\n SOCKET %d : %s", fd, buffer);
 
 					char *buffer_cpy = malloc(strlen(buffer) + 1);
 
@@ -245,83 +268,136 @@ int main()
 					//tokenize buffer to separate command items
 					char** commandToken = tokenizer(buffer_cpy);
 
-					// printf("%d", fd);   
-					
-					int user_flag = 0, pass_flag=0;
+					int user_flag = 0, login_flag=0, recordNum = -1;
 
 					for (int i=0; i<listSize; i++){
-						if ((userList[listSize].userFD == fd))
+
+						if (userList[i].userFD == fd)
 						{
+							printf("#");
 							// username linked to client 
-							user_flag = 0;
-							
-							
+							recordNum = i;							
+							userList[recordNum].usernameFlag = 1;
+							user_flag = 1;
+
+
+							if (userList[recordNum].loginFlag == 1)
+							{
+								login_flag = 1;
+							}
 						} 
-						// user not linked, ask for username
 					}
+					
 
+					// if (strcmp(commandToken[0], "QUIT") == 0)
+					// {
+					// 	bytes = 0;
+					// }
+					
 					//first check if the user is logged in 
-					if ((strcmp(commandToken[0], "USER") == 0) || ())
+					if (login_flag == 0)
 					{
-						userAuth(commandToken[1], fd);
-						//we also need to pass in client fd so they can store it in user list
-					}
-					
+						if(user_flag == 0)
+						{
+							if (strcmp(commandToken[0], "USER") == 0)
+							{
+								int user_status = userAuth(commandToken[1], fd);
+								
+								if (user_status == 1)
+								{
+									user_flag = 1;
+									send_to_client(fd, "Username found, please enter the password");
+								}
+								else if (user_status == 0)
+								{
+									send_to_client(fd, "Username not found, please try again");
+								}
+								// continue;
+							}
+							else{
+								send_to_client(fd, "INVALID: Please enter the USER");
+								// continue;
+							}
+						}
+						else
+						{
+							if (strcmp(commandToken[0], "PASS") == 0)
+							{
+								//first check if username auth is passsed and pass in user number
+								int pass_status = passAuth(commandToken[1], recordNum);	
 
-					if (strcmp(commandToken[0], "CWD") == 0)
+								if (pass_status == 1)
+								{
+									login_flag = 1;
+									send_to_client(fd, "Successfully loged in.");
+								}
+								else if (login_flag == 0)
+								{
+									char* send_msg = "Incorrect password, please try again";
+									printf("%s \n", send_msg);
+									send(fd, send_msg, 38, 0);
+								}
+								// continue;
+							}
+							else{
+								send_to_client(fd, "INVALID: Please enter the PASS");
+							}
+						}
+					}
+					else
 					{
-						send(fd, "HELLO", sizeof("HELLO"), 0);
+							if (strcmp(commandToken[0], "CWD") == 0)
+						{
+							send(fd, "HELLO", sizeof("HELLO"), 0);
+						}
+
+						else if (strcmp(commandToken[0], "PWD") == 0)
+						{
+							send(fd, "GOODBYE", sizeof("GOODBYE"), 0);
+						}
+						else if (strcmp(commandToken[0], "STOR") == 0)
+						{
+						
+						}
+						else if (strcmp(commandToken[0], "RETR") == 0)
+						{
+						
+						}
+						else if (strcmp(commandToken[0], "LIST") == 0)
+						{
+						
+						}
+						else
+						{
+							send_to_client(fd, "INVALID command");
+						}
 					}
 
-					else if (strcmp(commandToken[0], "PWD") == 0)
-					{
-						send(fd, "GOODBYE", sizeof("GOODBYE"), 0);
-					}
-
-					
-
-					else if (strcmp(commandToken[0], "PASS") == 0)
-					{
-						//first check if username auth is passsed and pass in user number
-						passAuth(commandToken[1], fd);	//usernumber not yet assigned
-					}
-
-					else if (strcmp(commandToken[0], "STOR") == 0)
-					{
-					
-					}
-
-					else if (strcmp(commandToken[0], "RETR") == 0)
-					{
-					
-					}
-
-					else if (strcmp(commandToken[0], "LIST") == 0)
-					{
-					
-					}
-					
+					// if (user_flag)
+					// {
+					// 	if (userList[recordNum].loginFlag == 1)
+					// 	{
+					// 		// user is logged in and can now use 
+					// 	}
+					// 	else
+					// 	{
+					// 		char* send_msg = " Please enter PASSWORD";
+					// 		printf("%s \n", send_msg);
+					// 		send(fd, send_msg, 23, 0);
+					// 	}
+					// }
+					// else{
+					// 	char* send_msg = " Please enter USER";
+					// 	printf("%s \n", send_msg);
+					// 	send(fd, send_msg, 19, 0);
 					
 					// user(bytes[1])
-					if(bytes==0)   //client has closed the connection
-					{
-						printf("Client dieconnected.. \n");
-						
-						//we are done, close fd
-						close(fd);
-
-						//once we are done handling the connection, remove the socket from the list of file descriptors that we are watching
-						FD_CLR(fd,&all_sockets);
-						
-						//if condiitons here
-							// { send(fd, buffer)}
-
-
-					}
-					//displaying the message received 
+					
 
 					free(buffer_cpy); 	
 					free(commandToken);
+										printRecords();
+
 				}
 			}
 		}

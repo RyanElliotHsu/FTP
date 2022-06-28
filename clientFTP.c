@@ -3,6 +3,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <time.h>
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -26,6 +27,21 @@
 //   printf("\n%s:%s$>>", getenv("USER"), path);
 // }
 
+void sleep_ms(int milliseconds){ // cross-platform sleep function
+#ifdef WIN32
+    Sleep(milliseconds);
+#elif _POSIX_C_SOURCE >= 199309L
+    struct timespec ts;
+    ts.tv_sec = milliseconds / 1000;
+    ts.tv_nsec = (milliseconds % 1000) * 1000000;
+    nanosleep(&ts, NULL);
+#else
+    if (milliseconds >= 1000)
+      sleep(milliseconds / 1000);
+    usleep((milliseconds % 1000) * 1000);
+#endif
+}
+
 void commandrunner(char* command, char** tokens)
 {   
     // if ()
@@ -34,10 +50,7 @@ void commandrunner(char* command, char** tokens)
     // char runc = "pwd";
     if (strcmp(tokens[0],"!PWD") == 0)
     {
-        printf("CLIENT: ");
-        printf("");
         system("pwd");
-        // execl ("/bin/pwd", "pwd", NULL);
     }
 
     if (strcmp(tokens[0],"!LIST") == 0)
@@ -49,9 +62,10 @@ void commandrunner(char* command, char** tokens)
         char* run = "cd ";
         // char args[] = tokens[1];
         // printf("%s", args);
-        strcat(run, tokens[1]);
+        // strcat(run, tokens[1]);
+        chdir(tokens[1]);
         // run += tokens[1];
-        printf("#%s", run);
+        // printf("#%s", run);
         // system(run);
     }
 
@@ -95,6 +109,15 @@ int main()
 
 	while(1)
 	{
+        bzero(bufferc, sizeof(bufferc));                    // Clearing buffer
+        recv(network_socket, bufferc, sizeof(bufferc), MSG_DONTWAIT); // Receives remaining buffer from server without blocking client (and using the flag to prevent waiting for a message)
+
+        if (strlen(bufferc) != 0)
+        {
+        printf("%s", bufferc); // Print the string only when the buffer is not empty
+        continue;
+        }
+
         char* command;
 		//request user for command
 		// UserPrompt();
@@ -140,34 +163,37 @@ int main()
             continue;
         }
 
-        printf("$%s$\n", rawcommand);
+        // printf("$%s$\n", rawcommand);
 
-        // send(network_socket,rawcommand,strlen(rawcommand)+1,0);
+        send(network_socket,rawcommand,strlen(rawcommand)+1,0);
 
         
         if((strcmp(tokens[0],"USER")==0) || (strcmp(tokens[0],"PASS")==0))
         {
-            send(network_socket,rawcommand,strlen(rawcommand),0);
+            // send(network_socket,rawcommand,strlen(rawcommand),0);
         }
         else if((strcmp(tokens[0],"RETR")==0) || (strcmp(tokens[0],"STOR")==0) )
         {
-            send(network_socket,rawcommand,strlen(rawcommand),0);
+            // send(network_socket,rawcommand,strlen(rawcommand),0);
         }
         else if((strcmp(tokens[0],"CWD")==0) || (strcmp(tokens[0],"PWD")==0) || (strcmp(tokens[0],"LIST")==0))
         {
-            send(network_socket,rawcommand,strlen(rawcommand),0);
+            // send(network_socket,rawcommand,strlen(rawcommand),0);
         }
         else if(strcmp(tokens[0],"QUIT")==0)
         {
-            send(network_socket,rawcommand,strlen(rawcommand),0);
+            // send(network_socket,rawcommand,strlen(rawcommand),0);
         }
-        else
-        {
-            printf("Invalid Command! \n");
-        }
+        // else
+        // {
+        //     printf("Invalid Command! \n");
+        //     continue;
+        // }
 
         bzero(bufferc, BUFFER_SIZE);                        // Clearing the buffer back to the buffer size
-        recv(network_socket, bufferc, sizeof(bufferc), MSG_DONTWAIT); // Client receiving the buffer output from the server
+        
+        sleep_ms(100);
+        recv(network_socket, bufferc, sizeof(bufferc), 0); // Client receiving the buffer output from the server
         printf("%s\n", bufferc);                              // print the buffer from the server on the client screen
         bufferc[0] = '\0';
 
