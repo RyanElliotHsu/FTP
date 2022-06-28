@@ -8,6 +8,8 @@
 #include <sys/time.h>
 #include <sys/select.h>
 #include <ctype.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #include "parseinput.h"
 
@@ -245,50 +247,95 @@ int main()
 					//tokenize buffer to separate command items
 					char** commandToken = tokenizer(buffer_cpy);
 
-					// printf("%d", fd);   
-					
-					int user_flag = 0, pass_flag=0;
-
-					for (int i=0; i<listSize; i++){
-						if ((userList[listSize].userFD == fd))
-						{
-							// username linked to client 
-							user_flag = 0;
-							
-							
-						} 
-						// user not linked, ask for username
-					}
-
-					//first check if the user is logged in 
-					if ((strcmp(commandToken[0], "USER") == 0) || ())
-					{
-						userAuth(commandToken[1], fd);
-						//we also need to pass in client fd so they can store it in user list
-					}
 					
 
-					if (strcmp(commandToken[0], "CWD") == 0)
-					{
-						send(fd, "HELLO", sizeof("HELLO"), 0);
-					}
 
-					else if (strcmp(commandToken[0], "PWD") == 0)
+						printf("111");
+					if (strcmp(commandToken[0], "STOR") == 0)
 					{
-						send(fd, "GOODBYE", sizeof("GOODBYE"), 0);
-					}
 
-					
 
-					else if (strcmp(commandToken[0], "PASS") == 0)
-					{
-						//first check if username auth is passsed and pass in user number
-						passAuth(commandToken[1], fd);	//usernumber not yet assigned
-					}
+						int pid = fork();
 
-					else if (strcmp(commandToken[0], "STOR") == 0)
-					{
-					
+						//child process to process STOR command
+						if (pid==0){
+							printf("111");
+
+							int data_fd = socket(AF_INET, SOCK_STREAM, 0);
+							if (data_fd < 0)
+							{
+								perror("Error opening Socket: Server Data.");
+								return 1;
+							}
+
+							printf("222");
+
+							//building data socket's Internet Address using the client port and IP received
+							struct sockaddr_in client_data_addr,server_data_addr;
+
+							bzero(&client_data_addr,sizeof(client_data_addr));
+							client_data_addr.sin_family = AF_INET;
+
+							int client_data_port = 9008;
+							client_data_addr.sin_port = htons(client_data_port);
+							inet_pton(AF_INET, inet_addr(INADDR_ANY), &(client_data_addr.sin_addr));
+
+							bzero(&server_data_addr,sizeof(server_data_addr));
+							server_data_addr.sin_family = AF_INET;	//address family
+							server_data_addr.sin_port = htons(9000);	//using port 9000 because port 20 is priveledged
+							server_data_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+							printf("333");
+
+							char server_data_ip[INET_ADDRSTRLEN]; 
+							inet_ntop(AF_INET, &(client_data_addr.sin_addr), server_data_ip, INET_ADDRSTRLEN);
+							printf("Server is connecting to IP: %s and Port: %d\n",INADDR_ANY,htons(client_data_port));
+							//connecting to server socket
+							int value =1;
+							setsockopt(data_fd,SOL_SOCKET,SO_LINGER,&value,sizeof(value));
+							if (bind(data_fd, (struct sockaddr*) &server_data_addr, sizeof(struct sockaddr_in)) == 0)
+								printf("Server Data binded Correctly\n");
+							else
+								printf("Server Data unable to bind\n");
+
+							if(connect(data_fd,(struct sockaddr*)&client_data_addr,sizeof(client_data_addr))<0)
+							{
+								perror("Connection Failed: Server Data.");
+								exit(-1);
+							}
+							char fileName[256];
+							strcpy(fileName, commandToken[1]);
+
+							printf("444");
+
+							FILE *newFile;
+							int bytesReceived = 0;
+                        	char receiveBuff[1024];
+							newFile = fopen("new.txt", "w"); 
+							printf("\nareeb");
+							//error check for opening file
+							if (!newFile){
+								printf("\nCould not open file..");
+							}
+
+							else{
+								//receive bytes into buffer and write to file
+								printf("555");
+								while (bytesReceived = recv(fd, receiveBuff, sizeof(receiveBuff), 0) > 0)
+								{
+									printf("1");
+									fwrite(receiveBuff, 1, bytesReceived, newFile);
+								}
+								
+								//file finished writing
+								printf("File writing complete..");
+							}
+						}
+
+						//parent process continues with other commands
+						else{
+
+						}
 					}
 
 					else if (strcmp(commandToken[0], "RETR") == 0)
