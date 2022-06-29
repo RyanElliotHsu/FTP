@@ -34,8 +34,6 @@ void commandrunner(char* command, char** tokens)
     // char runc = "pwd";
     if (strcmp(tokens[0],"!PWD") == 0)
     {
-        printf("CLIENT: ");
-        printf("");
         system("pwd");
         // execl ("/bin/pwd", "pwd", NULL);
     }
@@ -46,15 +44,14 @@ void commandrunner(char* command, char** tokens)
     }
     if (strcmp(tokens[0],"!CWD") == 0)
     {   
-        char* run = "cd ";
-        // char args[] = tokens[1];
-        // printf("%s", args);
-        strcat(run, tokens[1]);
-        // run += tokens[1];
-        printf("#%s", run);
-        // system(run);
+        if (chdir(tokens[1])==NULL)
+        {
+            perror(" Error changing directory");
+        }
+        else{
+            printf(" Local directory changed...");
+        }
     }
-
 }
 
 
@@ -96,10 +93,11 @@ int main()
 	while(1)
 	{
         char* command;
+        int rcv_flag = 1;
 		//request user for command
 		// UserPrompt();
 		//get input from user
-        printf(" ftp>");
+        printf("\n ftp>");
         command = readInput();
         if (command[0] == '\0') // If the command is empty meaning the user has pressed enter then we continue and loop back
         {
@@ -140,36 +138,40 @@ int main()
             continue;
         }
 
-        printf("$%s$\n", rawcommand);
+        // printf("$%s$\n", rawcommand);
 
         // send(network_socket,rawcommand,strlen(rawcommand)+1,0);
 
         
         if((strcmp(tokens[0],"USER")==0) || (strcmp(tokens[0],"PASS")==0))
         {
-            send(network_socket,rawcommand,strlen(rawcommand),0);
+            send(network_socket,rawcommand,strlen(rawcommand)+1,0);
         }
         else if((strcmp(tokens[0],"RETR")==0) || (strcmp(tokens[0],"STOR")==0) )
         {
-            send(network_socket,rawcommand,strlen(rawcommand),0);
+            send(network_socket,rawcommand,strlen(rawcommand)+1,0);
         }
         else if((strcmp(tokens[0],"CWD")==0) || (strcmp(tokens[0],"PWD")==0) || (strcmp(tokens[0],"LIST")==0))
         {
-            send(network_socket,rawcommand,strlen(rawcommand),0);
+            send(network_socket,rawcommand,strlen(rawcommand)+1,0);
         }
         else if(strcmp(tokens[0],"QUIT")==0)
         {
-            send(network_socket,rawcommand,strlen(rawcommand),0);
+            send(network_socket,rawcommand,strlen(rawcommand)+1,0);
         }
         else
         {
-            printf("Invalid Command! \n");
+            rcv_flag = 0;
+            printf(" Invalid Command! \n");
         }
 
-        bzero(bufferc, BUFFER_SIZE);                        // Clearing the buffer back to the buffer size
-        recv(network_socket, bufferc, sizeof(bufferc), MSG_DONTWAIT); // Client receiving the buffer output from the server
-        printf("%s\n", bufferc);                              // print the buffer from the server on the client screen
-        bufferc[0] = '\0';
+        if (rcv_flag == 1)
+        {
+            bzero(bufferc, BUFFER_SIZE);                        // Clearing the buffer back to the buffer size
+            recv(network_socket, bufferc, sizeof(bufferc), 0); // Client receiving the buffer output from the server
+            printf(" %s\n", bufferc);                              // print the buffer from the server on the client screen
+            bufferc[0] = '\0';
+        }
 
         free(command);
         free(tokens);
