@@ -365,7 +365,7 @@ int main()
 								if (pass_status == 1)
 								{
 									login_flag = 1;
-									send_to_client(fd, "Successfully loged in.");
+									send_to_client(fd, "Successfully logged in.");
 								}
 								else if (login_flag == 0)
 								{

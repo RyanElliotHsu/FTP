@@ -10,7 +10,11 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # Make data base, printed on Mon Jun 27 21:06:05 2022
+=======
+# Make data base, printed on Wed Jun 29 00:21:41 2022
+>>>>>>> Stashed changes
 =======
 # Make data base, printed on Wed Jun 29 00:21:41 2022
 >>>>>>> Stashed changes
@@ -53,7 +57,11 @@ __CFBundleIdentifier = com.microsoft.VSCode
 # environment
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 VSCODE_IPC_HOOK_EXTHOST = /var/folders/j3/cp2fcgdd0l78mz2m_vw_wx2c0000gn/T/vscode-ipc-688bea7e-a390-46ad-8ce6-b182225d98b7.sock
+=======
+VSCODE_IPC_HOOK_EXTHOST = /var/folders/j3/cp2fcgdd0l78mz2m_vw_wx2c0000gn/T/vscode-ipc-601f6c56-fd15-4583-9c7e-17fa96de69ba.sock
+>>>>>>> Stashed changes
 =======
 VSCODE_IPC_HOOK_EXTHOST = /var/folders/j3/cp2fcgdd0l78mz2m_vw_wx2c0000gn/T/vscode-ipc-601f6c56-fd15-4583-9c7e-17fa96de69ba.sock
 >>>>>>> Stashed changes
@@ -313,7 +321,11 @@ serverFTP.c:
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # Finished Make data base on Mon Jun 27 21:06:05 2022
+=======
+# Finished Make data base on Wed Jun 29 00:21:41 2022
+>>>>>>> Stashed changes
 =======
 # Finished Make data base on Wed Jun 29 00:21:41 2022
 >>>>>>> Stashed changes

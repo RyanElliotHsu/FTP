@@ -44,7 +44,7 @@ void commandrunner(char* command, char** tokens)
     }
     if (strcmp(tokens[0],"!CWD") == 0)
     {   
-        if (chdir(tokens[1])==NULL)
+        if (chdir(tokens[1])==-1)
         {
             perror(" Error changing directory");
         }
