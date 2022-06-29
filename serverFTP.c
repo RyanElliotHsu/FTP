@@ -248,6 +248,8 @@ int main()
 					
 					int user_flag = 0, login_flag=0, recordNum = -1;
 					
+<<<<<<< Updated upstream
+=======
 					for (int i=0; i<listSize; i++){
 
 						if (userList[i].userFD == fd)
@@ -269,6 +271,38 @@ int main()
 					if (bytes!=0)
 					{
 					
+					char *buffer_cpy = malloc(strlen(buffer) + 1);
+					
+					printf("#");
+					// char buffer_cpy[MAX_BUFFER];
+    				strcpy(buffer_cpy, buffer);
+
+					//tokenize buffer to separate command items
+					char** commandToken = tokenizer(buffer_cpy);
+
+>>>>>>> Stashed changes
+					for (int i=0; i<listSize; i++){
+
+						if (userList[i].userFD == fd)
+						{
+							printf("#");
+							// username linked to client 
+							recordNum = i;							
+							userList[recordNum].usernameFlag = 1;
+							user_flag = 1;
+
+
+							if (userList[recordNum].loginFlag == 1)
+							{
+								login_flag = 1;
+							}
+						} 
+					}
+<<<<<<< Updated upstream
+
+					if (bytes!=0)
+					{
+					
 >>>>>>> Stashed changes
 					char *buffer_cpy = malloc(strlen(buffer) + 1);
 
@@ -279,6 +313,8 @@ int main()
 					char** commandToken = tokenizer(buffer_cpy);
 
 					// printf("%d", fd);   
+=======
+>>>>>>> Stashed changes
 					
 					int user_flag = 0, pass_flag=0;
 
@@ -312,6 +348,7 @@ int main()
 					}
 <<<<<<< Updated upstream
 
+<<<<<<< Updated upstream
 =======
 >>>>>>> Stashed changes
 					
@@ -353,6 +390,17 @@ int main()
 =======
 						printf("Client on sock %d disconnected... \n", fd);
 >>>>>>> Stashed changes
+=======
+					free(buffer_cpy); 	
+					free(commandToken);
+					printRecords();
+					
+					}
+
+					else   //client has closed the connection
+					{
+						printf("Client on sock %d disconnected... \n", fd);
+>>>>>>> Stashed changes
 						
 						//we are done, close fd
 						close(fd);
@@ -366,6 +414,7 @@ int main()
 
 					}
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 					//displaying the message received 
 
 					free(buffer_cpy); 	
@@ -375,6 +424,12 @@ int main()
 					// user(bytes[1])
 					
 
+=======
+					
+					// user(bytes[1])
+					
+
+>>>>>>> Stashed changes
 					
 
 >>>>>>> Stashed changes
