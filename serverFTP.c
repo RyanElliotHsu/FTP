@@ -25,6 +25,9 @@ struct User
 	int usernameFlag;
 	int loginFlag;
 	int userFD;
+
+	char path[256];
+
 	//char* path
 };
 
@@ -33,11 +36,19 @@ struct User userList[MAXUSER];
 struct User assignUser(char* username, char* password)
 {
 	struct User tempUser;
+	char cwd[256];
 
 	//default username and login state is 0
 	tempUser.usernameFlag = 0;
 	tempUser.loginFlag = 0;
 	tempUser.userFD = -1;
+
+	if (getcwd(cwd, sizeof(cwd)) == NULL){
+		perror("Error getting working directory..");	
+	}
+	else{
+		strcpy(tempUser.path,cwd);
+	}
 
 	strcpy(tempUser.username,username);
 	strcpy(tempUser.password,password);
@@ -123,6 +134,7 @@ void printRecords(){
 	{
 		// if (userList[i].userFD == fd){
 			printf("\n || User: %s | Pass: %s | USER: %d | PASS: %d | FD: %d||", userList[i].username, userList[i].password, userList[i].usernameFlag, userList[i].loginFlag, userList[i].userFD);
+			printf("\n PATH : %s", userList[i].path);
 		// }
 	}
 }
@@ -268,7 +280,6 @@ int main()
 
 						if (userList[i].userFD == fd)
 						{
-							printf("#");
 							// username linked to client 
 							recordNum = i;							
 							userList[recordNum].usernameFlag = 1;
@@ -287,7 +298,6 @@ int main()
 					
 					char *buffer_cpy = malloc(strlen(buffer) + 1);
 					
-					printf("#");
 					// char buffer_cpy[MAX_BUFFER];
     				strcpy(buffer_cpy, buffer);
 
@@ -347,7 +357,7 @@ int main()
 								if (pass_status == 1)
 								{
 									login_flag = 1;
-									send_to_client(fd, "Successfully loged in.");
+									send_to_client(fd, "Successfully logged in.");
 								}
 								else if (login_flag == 0)
 								{
@@ -371,7 +381,7 @@ int main()
 
 						else if (strcmp(commandToken[0], "PWD") == 0)
 						{
-							send(fd, "GOODBYE", sizeof("GOODBYE"), 0);
+							send_to_client(fd, userList[recordNum].path);
 						}
 						else if (strcmp(commandToken[0], "STOR") == 0)
 						{
@@ -393,6 +403,7 @@ int main()
 
 					free(buffer_cpy); 	
 					free(commandToken);
+
 					printRecords();
 					
 					}
