@@ -231,12 +231,45 @@ int main()
 				//in this case, we just want to read its data
 				else
 				{
+<<<<<<< Updated upstream
+=======
+
+
+>>>>>>> Stashed changes
 					char buffer[MAX_BUFFER];
 
 					bzero(buffer,sizeof(buffer));
 					int bytes = recv(fd, buffer,sizeof(buffer), 0);
+<<<<<<< Updated upstream
 					printf("\nBUFFER:$%s$\n", buffer);
 
+=======
+					printf("\n SOCKET %d : %s", fd, buffer);
+					
+					int user_flag = 0, login_flag=0, recordNum = -1;
+					
+					for (int i=0; i<listSize; i++){
+
+						if (userList[i].userFD == fd)
+						{
+							printf("#");
+							// username linked to client 
+							recordNum = i;							
+							userList[recordNum].usernameFlag = 1;
+							user_flag = 1;
+
+
+							if (userList[recordNum].loginFlag == 1)
+							{
+								login_flag = 1;
+							}
+						} 
+					}
+
+					if (bytes!=0)
+					{
+					
+>>>>>>> Stashed changes
 					char *buffer_cpy = malloc(strlen(buffer) + 1);
 
 					// char buffer_cpy[MAX_BUFFER];
@@ -277,7 +310,10 @@ int main()
 					{
 						send(fd, "GOODBYE", sizeof("GOODBYE"), 0);
 					}
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 					
 
 					else if (strcmp(commandToken[0], "PASS") == 0)
@@ -296,16 +332,27 @@ int main()
 					
 					}
 
+<<<<<<< Updated upstream
 					else if (strcmp(commandToken[0], "LIST") == 0)
 					{
 					
 					}
 					
+=======
+					free(buffer_cpy); 	
+					free(commandToken);
+					printRecords();
+>>>>>>> Stashed changes
 					
-					// user(bytes[1])
-					if(bytes==0)   //client has closed the connection
+					}
+
+					else   //client has closed the connection
 					{
+<<<<<<< Updated upstream
 						printf("Client dieconnected.. \n");
+=======
+						printf("Client on sock %d disconnected... \n", fd);
+>>>>>>> Stashed changes
 						
 						//we are done, close fd
 						close(fd);
@@ -318,10 +365,19 @@ int main()
 
 
 					}
+<<<<<<< Updated upstream
 					//displaying the message received 
 
 					free(buffer_cpy); 	
 					free(commandToken);
+=======
+					
+					// user(bytes[1])
+					
+
+					
+
+>>>>>>> Stashed changes
 				}
 			}
 		}
