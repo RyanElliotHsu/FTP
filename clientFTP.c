@@ -406,8 +406,16 @@ int main()
 
             //accept connection
             int server_sd = accept(FTP_socket,0,0);
-            printf("\n Server conected for FTP ...\n");
+            printf("Server conected for FTP ...\n");
             
+
+            char filehealth[256];
+            bzero(filehealth, 256);                        // Clearing the buffer back to the buffer size
+            recv(network_socket, filehealth, sizeof(filehealth), 0); // Client receiving the buffer output from the server
+            // printf(" %s\n", filehealth);
+
+            if (strcmp(filehealth,"notfound")!=0)
+            {
             //open file and check for its validity
             char filename[256];
             strcpy(filename, tokens[1]);
@@ -420,6 +428,10 @@ int main()
 
             if(!file){
                 printf("Could not open file");
+                fclose(file);
+                close(server_sd);
+                remove(tokens[1]);
+                close(FTP_socket);
                 exit(1);
             }
             else
@@ -433,9 +445,11 @@ int main()
                 }
                 
             }
+            fclose(file);
+
+            }
             
             //closing files, sockets, and clearing stdout
-            fclose(file);
             close(server_sd);
             close(FTP_socket);
                 

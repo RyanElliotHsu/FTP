@@ -533,15 +533,23 @@ int main()
 									}
 
 									// create file variables and open file in binary mode
-									FILE* file = fopen(commandToken[1], "rb");
-									if(!file){
-										printf("File does not exist..");
+									char filename[256];
+            						strcpy(filename, commandToken[1]);
+									FILE* file = fopen(filename, "rb");
+									if(file==NULL){
+										printf("\n File does not exist..");
+										send_to_client(fd, "notfound");
+										close(FTP_server_socket);
+										msleep(50);
 										char* response = "550 No such file or directory.";
 										send_to_client(fd, response);
+										exit(1);
+
+
 									} //file found, begin retreival
 									else
 									{
-									
+										send_to_client(fd, " ");
 										while(1)
 										{
 											unsigned char buff[1024]={0};
