@@ -149,6 +149,12 @@ int main()
 	getAuth();
 
 
+	char defaultPath[256];
+	if (getcwd(defaultPath, sizeof(defaultPath)) == NULL){
+		perror("Error getting working directory..");	
+	}
+	
+
 	// For loop for debugging authtext file to server
 	// for (int i=0; i<listSize; ++i){
 	// 	printf("\nLIST:%s,%s", userList[i].username, userList[i].password);
@@ -293,9 +299,11 @@ int main()
 						} 
 					}
 
+
 					if (bytes!=0)
 					{
 					
+					chdir(userList[recordNum].path);
 					char *buffer_cpy = malloc(strlen(buffer) + 1);
 					
 					// char buffer_cpy[MAX_BUFFER];
@@ -374,26 +382,44 @@ int main()
 					}
 					else
 					{
-							if (strcmp(commandToken[0], "CWD") == 0)
+						if (strcmp(commandToken[0], "CWD") == 0)
 						{
-							send(fd, "HELLO", sizeof("HELLO"), 0);
-						}
 
+							if (chdir(commandToken[1])==-1)
+							{
+								perror("Error getting working directory..");
+								send_to_client(fd, " Error changing server directory");
+							}
+							else
+							{
+								char tempPath[256];
+								if (getcwd(tempPath, sizeof(tempPath)) == NULL){
+									perror("Error changing working directory..");
+								}
+								else{
+									strcpy(userList[recordNum].path, tempPath);
+        							printf(" Server changed directory ...");
+									send_to_client(fd, "Server directory changed...");
+
+								}
+
+							}
+						}
 						else if (strcmp(commandToken[0], "PWD") == 0)
 						{
 							send_to_client(fd, userList[recordNum].path);
 						}
 						else if (strcmp(commandToken[0], "STOR") == 0)
 						{
-						
+							send_to_client(fd, "still working on this");
 						}
 						else if (strcmp(commandToken[0], "RETR") == 0)
 						{
-						
+							send_to_client(fd, "still working on this");
 						}
 						else if (strcmp(commandToken[0], "LIST") == 0)
 						{
-						
+							send_to_client(fd, "still working on this");
 						}
 						else
 						{
@@ -415,6 +441,8 @@ int main()
 						userList[recordNum].loginFlag = 0;
 						userList[recordNum].usernameFlag = 0;
 						userList[recordNum].userFD = -1;
+						strcpy(userList[recordNum].path,defaultPath);
+
 						//we are done, close fd
 						close(fd);
 

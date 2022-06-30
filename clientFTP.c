@@ -44,15 +44,14 @@ void commandrunner(char* command, char** tokens)
     }
     if (strcmp(tokens[0],"!CWD") == 0)
     {   
-        char* run = "cd ";
-        // char args[] = tokens[1];
-        // printf("%s", args);
-        strcat(run, tokens[1]);
-        // run += tokens[1];
-        printf("#%s", run);
-        // system(run);
+        if (chdir(tokens[1])==-1)
+        {
+            perror(" Error changing directory");
+        }
+        else{
+            printf(" Local directory changed...");
+        }
     }
-
 }
 
 
@@ -170,7 +169,7 @@ int main()
         {
             bzero(bufferc, BUFFER_SIZE);                        // Clearing the buffer back to the buffer size
             recv(network_socket, bufferc, sizeof(bufferc), 0); // Client receiving the buffer output from the server
-            printf("%s\n", bufferc);                              // print the buffer from the server on the client screen
+            printf(" %s\n", bufferc);                              // print the buffer from the server on the client screen
             bufferc[0] = '\0';
         }
 
