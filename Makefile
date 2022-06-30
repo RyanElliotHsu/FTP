@@ -1,6 +1,6 @@
-shell: parseinput.o serverFTP.o clientFTP.o
-	gcc parseinput.o serverFTP.o -o serverFTP
-	gcc parseinput.o clientFTP.o -o clientFTP
+shell: serverFTP.o clientFTP.o
+	gcc  serverFTP.o -o serverFTP
+	gcc clientFTP.o -o clientFTP
 
 serverFTP.o: serverFTP.c 
 	gcc -c serverFTP.c
@@ -8,41 +8,7 @@ serverFTP.o: serverFTP.c
 clientFTP.o: clientFTP.c 
 	gcc -c clientFTP.c
 
-parseinput.o: parseinput.c parseinput.h
-	gcc -c parseinput.c
-
 clean:
 	rm *.o shell
 
-
-# shell: print.o read.o splitter.o checkpipe.o singlecommand.o pipe.o server.o client.o
-# 	gcc print.o read.o splitter.o checkpipe.o singlecommand.o pipe.o server.o -o server
-# 	gcc print.o read.o splitter.o checkpipe.o singlecommand.o pipe.o client.o -o client
-
-# server.o: server.c server.h
-# 	gcc -c server.c
-
-# client.o: client.c client.h
-# 	gcc -c client.c
-
-# print.o: print.c print.h
-# 	gcc -c print.c
-
-# read.o: read.c read.h
-# 	gcc -c read.c
-
-# splitter.o: splitter.c splitter.h
-# 	gcc -c splitter.c
-
-# checkpipe.o: checkpipe.c checkpipe.h
-# 	gcc -c checkpipe.c
-
-# singlecommand.o: singlecommand.c singlecommand.h
-# 	gcc -c singlecommand.c
-
-# pipe.o: pipe.c pipe.h
-# 	gcc -c pipe.c
-
-# clean:
-# 	rm *.o shell
 
