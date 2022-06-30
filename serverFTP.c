@@ -8,6 +8,8 @@
 #include <sys/time.h>
 #include <sys/select.h>
 #include <ctype.h>
+#include <time.h>
+#include <errno.h>   
 
 #include "parseinput.h"
 
@@ -15,6 +17,29 @@
 #define PORT 9007
 #define MAXUSER 100
 #define MAX_BUFFER 2048
+
+
+int msleep(long msec)
+{
+    struct timespec ts;
+    int res;
+
+    if (msec < 0)
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    ts.tv_sec = msec / 1000;
+    ts.tv_nsec = (msec % 1000) * 1000000;
+
+    do {
+        res = nanosleep(&ts, &ts);
+    } while (res && errno == EINTR);
+
+    return res;
+}
+
 
 int listSize = 0;
 
@@ -99,12 +124,12 @@ int userAuth(const char* username, int usernumber)
 		{
 			userList[i].userFD = usernumber;
 			userList[i].usernameFlag = 1;
-			printf("\nUser found");
+			printf("\n User found..");
 			
 			return 1;
 		}
 	}
-		printf("\nUser not found");
+		printf("\n User not found..");
 		return 0;
 }
 
@@ -113,12 +138,12 @@ int passAuth(const char* password, int userNum)
 	if (strcmp(password,userList[userNum].password)==0)
 	{
 		userList[userNum].loginFlag = 1;
-		printf("\nPassword Correct");
+		printf("\n Password correct..");
 		return 1;
 	}
 	else
 	{
-		printf("Incorrect password..");
+		printf("\n Incorrect password..");
 		return 0;
 	}
 }
@@ -180,7 +205,6 @@ int main()
 	server_address.sin_family = AF_INET;
 	server_address.sin_port = htons(PORT);
 	server_address.sin_addr.s_addr = INADDR_ANY;
-
 
 	//bind
 	if(bind(server_socket, (struct sockaddr*)&server_address,sizeof(server_address))<0)
@@ -316,7 +340,7 @@ int main()
 
 						if (userList[i].userFD == fd)
 						{
-							printf("#");
+							// printf("#");
 							// username linked to client 
 							recordNum = i;							
 							userList[recordNum].usernameFlag = 1;
@@ -342,7 +366,7 @@ int main()
 								if (user_status == 1)
 								{
 									user_flag = 1;
-									send_to_client(fd, "331 Username OK, need password.");
+									send_to_client(fd, "331 Username OK, need passsword.");
 								}
 								else if (user_status == 0)
 								{
@@ -351,7 +375,7 @@ int main()
 								// continue;
 							}
 							else{
-								send_to_client(fd, "Please authenticate first.");
+								send_to_client(fd, "530 Not logged in.");
 								// continue;
 							}
 						}
@@ -376,7 +400,7 @@ int main()
 								// continue;
 							}
 							else{
-								send_to_client(fd, "INVALID: Please enter the PASS");
+								send_to_client(fd, "530 Not logged in.");
 							}
 						}
 					}
@@ -399,7 +423,7 @@ int main()
 								else{
 									strcpy(userList[recordNum].path, tempPath);
         							printf(" Server changed directory ...");
-									send_to_client(fd, "Server directory changed...");
+									send_to_client(fd, "200 directory changed to ");
 
 								}
 
@@ -411,26 +435,267 @@ int main()
 						}
 						else if (strcmp(commandToken[0], "STOR") == 0)
 						{
-							send_to_client(fd, "still working on this");
+							int ftp_port;
+							char ftp_port_str[16];
+							bzero(ftp_port_str, 16);  
+							recv(fd, ftp_port_str, sizeof(ftp_port_str), 0);
+
+							ftp_port = atoi(ftp_port_str);
+
+							pid_t child = fork();
+
+							if (child == 0)
+							{
+							
+							int FTP_server_socket;
+							FTP_server_socket = socket(AF_INET , SOCK_STREAM, 0);
+
+							//check for fail error
+							if (FTP_server_socket == -1) {
+								printf("socket creation failed..\n");
+								exit(EXIT_FAILURE);
+							}
+
+							//setsock
+							int value  = 1;
+							setsockopt(FTP_server_socket,SOL_SOCKET,SO_REUSEADDR,&value,sizeof(value)); //&(int){1},sizeof(int)
+							
+							struct sockaddr_in FTP_server_address;
+							bzero(&FTP_server_address,sizeof(FTP_server_address));
+							FTP_server_address.sin_family = AF_INET;
+							FTP_server_address.sin_port = htons(ftp_port);
+							FTP_server_address.sin_addr.s_addr = INADDR_ANY;
+
+							msleep(250);
+							//connect
+							if(connect(FTP_server_socket,(struct sockaddr*)&FTP_server_address,sizeof(server_address))<0)
+							{
+								perror("connect");
+								exit(EXIT_FAILURE);
+							}
+
+							char filename[256];
+							strcpy(filename, commandToken[1]);
+							int bytesRead = 0;
+							char readBuffer[1024];
+
+							FILE* file = fopen(filename, "wb");
+
+							//error check for opening file
+							if(!file){
+								printf("\nCould not open file..");
+							}
+							else
+							{
+								while ((bytesRead=read(FTP_server_socket, readBuffer, 1024)) > 0)
+								{
+									fflush(stdout);
+									fwrite(readBuffer, 1, bytesRead, file);
+								}
+
+								// send_to_client(fd, "226 Transfer completed.");
+							}
+
+							printf("\nFile creation complete.");
+							send_to_client(fd, " 226 Transfer completed ...");
+
+							fclose(file);
+							close(FTP_server_socket);
+							fflush(stdout);
+							exit(1);
+
+
+							// char FTP_bufferc[128];
+							// bzero(FTP_bufferc, 128);                        // Clearing the buffer back to the buffer size
+							// recv(FTP_server_socket, FTP_bufferc, sizeof(FTP_bufferc), 0); // Client receiving the buffer output from the server
+							// printf(" %s\n", FTP_bufferc);                              // print the buffer from the server on the client screen
+							// FTP_bufferc[0] = '\0';
+
+								// send_to_client(FTP_server_socket, "Working");
+
+							}
+							// send_to_client(fd, "still working on this");
 						}
 						else if (strcmp(commandToken[0], "RETR") == 0)
 						{
-							send_to_client(fd, "still working on this");
+
+							int ftp_port;
+							char ftp_port_str[16];
+							bzero(ftp_port_str, 16);  
+							recv(fd, ftp_port_str, 16, 0);
+
+							ftp_port = atoi(ftp_port_str);
+							printf("\n $$%d", ftp_port);
+							
+							
+								pid_t child = fork();
+								if (child == 0)
+								{
+								
+									int FTP_server_socket;
+									FTP_server_socket = socket(AF_INET , SOCK_STREAM, 0);
+
+									//check for fail error
+									if (FTP_server_socket == -1) {
+										printf("socket creation failed..\n");
+										exit(EXIT_FAILURE);
+									}
+
+									//setsock
+									int value  = 1;
+									setsockopt(FTP_server_socket,SOL_SOCKET,SO_REUSEADDR,&value,sizeof(value)); //&(int){1},sizeof(int)
+									
+									struct sockaddr_in FTP_server_address;
+									bzero(&FTP_server_address,sizeof(FTP_server_address));
+									FTP_server_address.sin_family = AF_INET;
+									FTP_server_address.sin_port = htons(ftp_port);
+									FTP_server_address.sin_addr.s_addr = INADDR_ANY;
+
+									msleep(250);
+
+									//connect
+									if(connect(FTP_server_socket,(struct sockaddr*)&FTP_server_address,sizeof(server_address))<0)
+									{
+										perror("connect");
+										exit(EXIT_FAILURE);
+									}
+
+									FILE* file = fopen(commandToken[1], "rb");
+									//check if file exists
+									if(!file){
+										printf("File does not exist..");
+										char* response = "550 No such file or directory.";
+										send_to_client(fd, response);
+									} //file found, begin retreival
+									else
+									{
+									
+									while(1)
+									{
+										unsigned char buff[1024]={0};
+										int bytesRead = fread(buff, 1, 1024, file);
+										
+										if(bytesRead>0)
+										{
+											// fflush(stdout);
+											write(FTP_server_socket, buff, bytesRead);
+										}
+										
+										if (bytesRead < 1024)
+										{
+											break;
+										}
+									}
+									close(FTP_server_socket);
+									fclose(file);		
+									
+									}		// bzero(FTP_bufferc, 128);                        // Clearing the buffer back to the buffer size
+
+									send_to_client(fd, " 226 Transfer Completed ...");
+									exit(1);
+								}
+
+
 						}
 						else if (strcmp(commandToken[0], "LIST") == 0)
 						{
-							send_to_client(fd, "still working on this");
+							int ftp_port;
+							char ftp_port_str[16];
+							bzero(ftp_port_str, 16);  
+							recv(fd, ftp_port_str, 16, 0);
+
+							ftp_port = atoi(ftp_port_str);
+							// printf("\n $$%d", ftp_port);
+							
+							
+								pid_t child = fork();
+								if (child == 0)
+								{
+								
+									int FTP_server_socket;
+									FTP_server_socket = socket(AF_INET , SOCK_STREAM, 0);
+
+									//check for fail error
+									if (FTP_server_socket == -1) {
+										printf("socket creation failed..\n");
+										exit(EXIT_FAILURE);
+									}
+
+									//setsock
+									int value  = 1;
+									setsockopt(FTP_server_socket,SOL_SOCKET,SO_REUSEADDR,&value,sizeof(value)); //&(int){1},sizeof(int)
+									
+									struct sockaddr_in FTP_server_address;
+									bzero(&FTP_server_address,sizeof(FTP_server_address));
+									FTP_server_address.sin_family = AF_INET;
+									FTP_server_address.sin_port = htons(ftp_port);
+									FTP_server_address.sin_addr.s_addr = INADDR_ANY;
+
+									msleep(250);
+									//connect
+									if(connect(FTP_server_socket,(struct sockaddr*)&FTP_server_address,sizeof(server_address))<0)
+									{
+										perror("connect");
+										exit(EXIT_FAILURE);
+									}
+
+									char file_line[256];
+									//creating a pipe to send back the list of files in the server directory to the client
+									FILE *list_file = popen("ls", "r");
+									if (list_file)
+									{
+										while (fgets(file_line, sizeof(file_line), list_file))
+										{
+											if (send(FTP_server_socket,file_line,strlen(file_line),0) < 0)
+											{
+												perror("Error Sending file..\n");
+												return 0;
+											}
+											bzero(&file_line,sizeof(file_line));
+											fflush(stdout);
+											
+										}
+										pclose(list_file);
+									}
+									send_to_client(fd,"226 Transfer completed...");
+									
+
+									/*
+									FILE *file;
+									FILE* tmpLS = fopen("tmpfile", "w");
+
+									char *command = "ls";
+									char c = 0;
+									char* lsBuff = "";
+
+									if (0 == (file = popen(command, "r")))
+									{
+										perror("Error executing LIST..");
+									}
+
+									while (fread(&c, sizeof(c), 1, file))
+									{
+										fwrite(c, 1, 1, tmpLS);
+									}
+
+									send_to_client(FTP_server_socket, "hiiiiii");
+									*/ 
+
+									// pclose(file);
+									close(FTP_server_socket);
+									exit(1);
+								}
 						}
 						else
 						{
-							send_to_client(fd, "INVALID command");
+							send_to_client(fd, "202 Command not implemented.");
 						}
 					}
 
 					free(buffer_cpy); 	
 					free(commandToken);
 
-					printRecords();
+					// printRecords();
 					
 					}
 
