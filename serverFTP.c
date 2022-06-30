@@ -334,16 +334,16 @@ int main()
 								if (user_status == 1)
 								{
 									user_flag = 1;
-									send_to_client(fd, "Username found, please enter the password");
+									send_to_client(fd, "331 Username OK, need password.");
 								}
 								else if (user_status == 0)
 								{
-									send_to_client(fd, "Username not found, please try again");
+									send_to_client(fd, "530 Not logged in.");
 								}
 								// continue;
 							}
 							else{
-								send_to_client(fd, "INVALID: Please enter the USER");
+								send_to_client(fd, "Please authenticate first.");
 								// continue;
 							}
 						}
@@ -357,11 +357,11 @@ int main()
 								if (pass_status == 1)
 								{
 									login_flag = 1;
-									send_to_client(fd, "Successfully logged in.");
+									send_to_client(fd, "230 User logged in, proceed.");
 								}
 								else if (login_flag == 0)
 								{
-									char* send_msg = "Incorrect password, please try again";
+									char* send_msg = "530 Not logged in.";
 									printf("%s \n", send_msg);
 									send(fd, send_msg, 38, 0);
 								}
